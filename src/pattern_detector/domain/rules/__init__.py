@@ -43,12 +43,14 @@ from pattern_detector.domain.rules.behavioral_rules import (
     ChainOfResponsibilityRule,
     CommandEncapsulationRule,
     DelegatePatternWeakRule,
+    InterpreterPatternRule,
     IteratorProtocolRule,
     MediatorCoordinatorRule,
     MementoCodableSnapshotRule,
     ObserverCombinePublishedRule,
     StateEnumAssociatedValuesRule,
     StrategyProtocolInjectionRule,
+    TemplateMethodRule,
     VisitorPatternRule,
 )
 from pattern_detector.domain.rules.resilience_safety_rules import (
@@ -89,14 +91,14 @@ DEFAULT_RULES: list[type[BaseRule]] = [
     KeyPathDynamicLookupRule,
     ViewModifierPipelineRule,
 
-    # 4. Creational (GoF)
+    # 4. Creational (GoF 5/5)
     SingletonSharedInstanceRule,
     FactoryMethodRule,
     AbstractFactoryRule,
     BuilderFluentChainRule,
     PrototypeClonableRule,
 
-    # 5. Structural (GoF)
+    # 5. Structural (GoF 7/7)
     AdapterViaExtensionRule,
     BridgePatternRule,
     CompositeViewHierarchyRule,
@@ -105,16 +107,18 @@ DEFAULT_RULES: list[type[BaseRule]] = [
     FlyweightPatternRule,
     ProxyPatternRule,
 
-    # 6. Behavioral (GoF)
+    # 6. Behavioral (GoF 11/11)
     ChainOfResponsibilityRule,
     CommandEncapsulationRule,
     DelegatePatternWeakRule,
+    InterpreterPatternRule,
     IteratorProtocolRule,
     MediatorCoordinatorRule,
     MementoCodableSnapshotRule,
     ObserverCombinePublishedRule,
     StateEnumAssociatedValuesRule,
     StrategyProtocolInjectionRule,
+    TemplateMethodRule,
     VisitorPatternRule,
 
     # 7. Resilience & Hazards
@@ -158,14 +162,14 @@ def get_default_rules() -> list[BaseRule]:
         KeyPathDynamicLookupRule(),
         ViewModifierPipelineRule(),
 
-        # 4. Creational (GoF)
+        # 4. Creational (GoF 5/5)
         SingletonSharedInstanceRule(),
         FactoryMethodRule(),
         AbstractFactoryRule(),
         BuilderFluentChainRule(),
         PrototypeClonableRule(),
 
-        # 5. Structural (GoF)
+        # 5. Structural (GoF 7/7)
         AdapterViaExtensionRule(),
         BridgePatternRule(),
         CompositeViewHierarchyRule(),
@@ -174,16 +178,18 @@ def get_default_rules() -> list[BaseRule]:
         FlyweightPatternRule(),
         ProxyPatternRule(),
 
-        # 6. Behavioral (GoF)
+        # 6. Behavioral (GoF 11/11)
         ChainOfResponsibilityRule(),
         CommandEncapsulationRule(),
         DelegatePatternWeakRule(),
+        InterpreterPatternRule(),
         IteratorProtocolRule(),
         MediatorCoordinatorRule(),
         MementoCodableSnapshotRule(),
         ObserverCombinePublishedRule(),
         StateEnumAssociatedValuesRule(),
         StrategyProtocolInjectionRule(),
+        TemplateMethodRule(),
         VisitorPatternRule(),
 
         # 7. Resilience

@@ -234,6 +234,13 @@ PATTERN_CATALOG: dict[PatternType, PatternDefinition] = {
         description="One-to-one delegation contract holding a `weak` reference to prevent retain cycles.",
         gof_equivalent="Observer / Mediator",
     ),
+    PatternType.INTERPRETER_EXPRESSION_AST: PatternDefinition(
+        type=PatternType.INTERPRETER_EXPRESSION_AST,
+        category=PatternCategory.BEHAVIORAL,
+        name="Interpreter Pattern (Expression AST)",
+        description="Evaluates domain sentences or language grammars through composite expression trees (`interpret(context:)` / `evaluate()`).",
+        gof_equivalent="Interpreter",
+    ),
     PatternType.ITERATOR_PROTOCOL: PatternDefinition(
         type=PatternType.ITERATOR_PROTOCOL,
         category=PatternCategory.BEHAVIORAL,
@@ -275,6 +282,13 @@ PATTERN_CATALOG: dict[PatternType, PatternDefinition] = {
         name="Strategy Protocol / Closure Injection",
         description="Interchangeable algorithm strategy encapsulated in protocol abstraction or closure property.",
         gof_equivalent="Strategy",
+    ),
+    PatternType.TEMPLATE_METHOD_ALGORITHM: PatternDefinition(
+        type=PatternType.TEMPLATE_METHOD_ALGORITHM,
+        category=PatternCategory.BEHAVIORAL,
+        name="Template Method Algorithm Skeleton",
+        description="Defines the skeleton of an algorithm in a base class or protocol extension, deferring specific steps to subclasses/conforming types.",
+        gof_equivalent="Template Method",
     ),
     PatternType.VISITOR_DOUBLE_DISPATCH: PatternDefinition(
         type=PatternType.VISITOR_DOUBLE_DISPATCH,

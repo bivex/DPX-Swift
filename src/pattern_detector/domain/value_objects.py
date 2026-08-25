@@ -58,16 +58,18 @@ class PatternType(str, Enum):
     FLYWEIGHT_CACHE = "flyweight_cache"
     PROXY_VIRTUAL_OR_REMOTE = "proxy_virtual_or_remote"
 
-    # 6. GoF Behavioral
+    # 6. GoF Behavioral (11 Patterns)
     CHAIN_OF_RESPONSIBILITY = "chain_of_responsibility"
     COMMAND_ENCAPSULATION = "command_encapsulation"
     DELEGATE_PATTERN_WEAK = "delegate_pattern_weak"
+    INTERPRETER_EXPRESSION_AST = "interpreter_expression_ast"
     ITERATOR_PROTOCOL = "iterator_protocol"
     MEDIATOR_COORDINATOR = "mediator_coordinator"
     MEMENTO_CODABLE_SNAPSHOT = "memento_codable_snapshot"
     OBSERVER_COMBINE_PUBLISHED = "observer_combine_published"
     STATE_ENUM_ASSOCIATED_VALUES = "state_enum_associated_values"
     STRATEGY_PROTOCOL_INJECTION = "strategy_protocol_injection"
+    TEMPLATE_METHOD_ALGORITHM = "template_method_algorithm"
     VISITOR_DOUBLE_DISPATCH = "visitor_double_dispatch"
 
     # 7. Resilience, Memory Safety & Hazards

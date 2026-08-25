@@ -299,6 +299,75 @@ class MediatorCoordinatorRule(BaseRule):
         return detections
 
 
+class InterpreterPatternRule(BaseRule):
+    """Detects Interpreter pattern evaluating expression trees via `interpret(context:)` / `evaluate()`."""
+
+    def evaluate(self, model: CodeModel) -> list[Detection]:
+        detections: list[Detection] = []
+        for t in model.all_types:
+            has_interpret = any(m.name in ("interpret", "evaluate", "eval") for m in t.methods)
+            if "Expression" in t.name or "AST" in t.name or (has_interpret and "Context" in t.raw_text):
+                score = 0.90 if has_interpret else 0.80
+                evidences = [
+                    Evidence(
+                        rule_code="BEHAVIORAL_INTERPRETER_EXPRESSION",
+                        description=f"Type '{t.name}' implements Interpreter pattern evaluating domain expression AST",
+                        weight=score,
+                        location=t.location,
+                    )
+                ]
+                detections.append(
+                    Detection(
+                        pattern_type=PatternType.INTERPRETER_EXPRESSION_AST,
+                        pattern_category=PatternCategory.BEHAVIORAL,
+                        target_name=t.name,
+                        target_kind=t.kind,
+                        confidence=Confidence(score=score, evidences=evidences),
+                        primary_location=t.location,
+                        evidences=evidences,
+                    )
+                )
+        return detections
+
+
+class TemplateMethodRule(BaseRule):
+    """Detects Template Method pattern defining algorithm skeleton with deferred step hooks."""
+
+    def evaluate(self, model: CodeModel) -> list[Detection]:
+        detections: list[Detection] = []
+        for t in model.classes:
+            has_template_methods = any(
+                m.name.startswith("process") or m.name.startswith("execute") or m.name.startswith("handle")
+                for m in t.methods
+            )
+            has_step_hooks = any(
+                m.name.startswith("step") or m.name.startswith("before") or m.name.startswith("after") or m.name.startswith("on")
+                for m in t.methods
+            )
+            if (has_template_methods and has_step_hooks) or "Template" in t.name:
+                score = 0.85
+                evidences = [
+                    Evidence(
+                        rule_code="BEHAVIORAL_TEMPLATE_METHOD",
+                        description=f"Class '{t.name}' implements Template Method algorithm skeleton coordinating lifecycle step hooks",
+                        weight=score,
+                        location=t.location,
+                    )
+                ]
+                detections.append(
+                    Detection(
+                        pattern_type=PatternType.TEMPLATE_METHOD_ALGORITHM,
+                        pattern_category=PatternCategory.BEHAVIORAL,
+                        target_name=t.name,
+                        target_kind="class",
+                        confidence=Confidence(score=score, evidences=evidences),
+                        primary_location=t.location,
+                        evidences=evidences,
+                    )
+                )
+        return detections
+
+
 class VisitorPatternRule(BaseRule):
     """Detects Visitor pattern via `accept(visitor:)` double dispatch."""
 

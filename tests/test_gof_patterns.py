@@ -7,12 +7,14 @@ from pattern_detector.domain.rules.behavioral_rules import (
     ChainOfResponsibilityRule,
     CommandEncapsulationRule,
     DelegatePatternWeakRule,
+    InterpreterPatternRule,
     IteratorProtocolRule,
     MediatorCoordinatorRule,
     MementoCodableSnapshotRule,
     ObserverCombinePublishedRule,
     StateEnumAssociatedValuesRule,
     StrategyProtocolInjectionRule,
+    TemplateMethodRule,
     VisitorPatternRule,
 )
 from pattern_detector.domain.rules.creational_rules import (
@@ -348,6 +350,47 @@ def test_mediator_coordinator() -> None:
     assert detections[0].pattern_type == PatternType.MEDIATOR_COORDINATOR
 
 
+def test_interpreter_expression_ast() -> None:
+    code = """
+    class BinaryExpression {
+        func interpret(context: ExpressionContext) -> Int {
+            return 42
+        }
+    }
+    """
+    parser = NativeSwiftParserAdapter()
+    model = parser.parse_codebase([("Expression.swift", code)])
+
+    rule = InterpreterPatternRule()
+    detections = rule.evaluate(model)
+
+    assert len(detections) == 1
+    assert detections[0].pattern_type == PatternType.INTERPRETER_EXPRESSION_AST
+
+
+def test_template_method_algorithm() -> None:
+    code = """
+    class DataPipelineTemplate {
+        func processPipeline() {
+            stepRead()
+            stepTransform()
+            stepWrite()
+        }
+        func stepRead() {}
+        func stepTransform() {}
+        func stepWrite() {}
+    }
+    """
+    parser = NativeSwiftParserAdapter()
+    model = parser.parse_codebase([("Pipeline.swift", code)])
+
+    rule = TemplateMethodRule()
+    detections = rule.evaluate(model)
+
+    assert len(detections) == 1
+    assert detections[0].pattern_type == PatternType.TEMPLATE_METHOD_ALGORITHM
+
+
 def test_visitor_double_dispatch() -> None:
     code = """
     class DocumentNode {
@@ -362,3 +405,4 @@ def test_visitor_double_dispatch() -> None:
 
     assert len(detections) == 1
     assert detections[0].pattern_type == PatternType.VISITOR_DOUBLE_DISPATCH
+
