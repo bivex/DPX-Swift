@@ -46,6 +46,37 @@ class AdapterViaExtensionRule(BaseRule):
         return detections
 
 
+class BridgePatternRule(BaseRule):
+    """Detects Bridge pattern decoupling abstraction from implementor protocol."""
+
+    def evaluate(self, model: CodeModel) -> list[Detection]:
+        detections: list[Detection] = []
+        for t in model.all_types:
+            if "Bridge" in t.name or any("Implementor" in p.type_name or "Renderer" in p.type_name or "Driver" in p.type_name for p in t.properties):
+                impl_props = [p for p in t.properties if any(k in p.type_name for k in ("Implementor", "Renderer", "Driver", "Engine"))]
+                if impl_props or "Bridge" in t.name:
+                    evidences = [
+                        Evidence(
+                            rule_code="STRUCTURAL_BRIDGE_PATTERN",
+                            description=f"Type '{t.name}' decouples abstraction from implementor via '{impl_props[0].name if impl_props else 'implementor'}'",
+                            weight=0.85,
+                            location=t.location,
+                        )
+                    ]
+                    detections.append(
+                        Detection(
+                            pattern_type=PatternType.BRIDGE_IMPLEMENTOR,
+                            pattern_category=PatternCategory.STRUCTURAL,
+                            target_name=t.name,
+                            target_kind=t.kind,
+                            confidence=Confidence(score=0.85, evidences=evidences),
+                            primary_location=t.location,
+                            evidences=evidences,
+                        )
+                    )
+        return detections
+
+
 class DecoratorWrapperRule(BaseRule):
     """Detects Decorator / Wrapper pattern holding an underlying wrapped instance."""
 
@@ -149,4 +180,62 @@ class FacadeServiceRule(BaseRule):
                             evidences=evidences,
                         )
                     )
+        return detections
+
+
+class FlyweightPatternRule(BaseRule):
+    """Detects Flyweight pattern sharing instances via dictionary pool or factory cache."""
+
+    def evaluate(self, model: CodeModel) -> list[Detection]:
+        detections: list[Detection] = []
+        for t in model.all_types:
+            if "Flyweight" in t.name or (any("cache" in p.name.lower() or "pool" in p.name.lower() for p in t.properties) and any(m.name.startswith("get") or m.name.startswith("make") for m in t.methods)):
+                evidences = [
+                    Evidence(
+                        rule_code="STRUCTURAL_FLYWEIGHT_CACHE",
+                        description=f"Type '{t.name}' shares fine-grained instances via Flyweight pooling cache",
+                        weight=0.85,
+                        location=t.location,
+                    )
+                ]
+                detections.append(
+                    Detection(
+                        pattern_type=PatternType.FLYWEIGHT_CACHE,
+                        pattern_category=PatternCategory.STRUCTURAL,
+                        target_name=t.name,
+                        target_kind=t.kind,
+                        confidence=Confidence(score=0.85, evidences=evidences),
+                        primary_location=t.location,
+                        evidences=evidences,
+                    )
+                )
+        return detections
+
+
+class ProxyPatternRule(BaseRule):
+    """Detects Proxy pattern controlling access to a remote/virtual real subject."""
+
+    def evaluate(self, model: CodeModel) -> list[Detection]:
+        detections: list[Detection] = []
+        for t in model.all_types:
+            if "Proxy" in t.name:
+                evidences = [
+                    Evidence(
+                        rule_code="STRUCTURAL_PROXY_PATTERN",
+                        description=f"Type '{t.name}' acts as surrogate Proxy controlling access to underlying target",
+                        weight=0.85,
+                        location=t.location,
+                    )
+                ]
+                detections.append(
+                    Detection(
+                        pattern_type=PatternType.PROXY_VIRTUAL_OR_REMOTE,
+                        pattern_category=PatternCategory.STRUCTURAL,
+                        target_name=t.name,
+                        target_kind=t.kind,
+                        confidence=Confidence(score=0.85, evidences=evidences),
+                        primary_location=t.location,
+                        evidences=evidences,
+                    )
+                )
         return detections

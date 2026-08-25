@@ -84,6 +84,39 @@ class FactoryMethodRule(BaseRule):
         return detections
 
 
+class AbstractFactoryRule(BaseRule):
+    """Detects Abstract Factory protocols declaring multiple factory creation methods."""
+
+    FACTORY_NAME_PATTERN = re.compile(r"\b(make[A-Z]\w+|create[A-Z]\w+)\b")
+
+    def evaluate(self, model: CodeModel) -> list[Detection]:
+        detections: list[Detection] = []
+        for proto in model.protocols:
+            creation_methods = [m for m in proto.methods if self.FACTORY_NAME_PATTERN.search(m.name)]
+            if len(creation_methods) >= 2 or ("Factory" in proto.name and len(creation_methods) >= 1):
+                score = 0.90 if len(creation_methods) >= 2 else 0.80
+                evidences = [
+                    Evidence(
+                        rule_code="CREATIONAL_ABSTRACT_FACTORY",
+                        description=f"Protocol '{proto.name}' defines Abstract Factory contract declaring {len(creation_methods)} creation method(s): {', '.join(m.name for m in creation_methods[:3])}",
+                        weight=score,
+                        location=proto.location,
+                    )
+                ]
+                detections.append(
+                    Detection(
+                        pattern_type=PatternType.ABSTRACT_FACTORY,
+                        pattern_category=PatternCategory.CREATIONAL,
+                        target_name=proto.name,
+                        target_kind="protocol",
+                        confidence=Confidence(score=score, evidences=evidences),
+                        primary_location=proto.location,
+                        evidences=evidences,
+                    )
+                )
+        return detections
+
+
 class BuilderFluentChainRule(BaseRule):
     """Detects Builder pattern via fluent method chaining returning `Self` or mutating self."""
 
@@ -92,7 +125,7 @@ class BuilderFluentChainRule(BaseRule):
         for t in model.all_types:
             chain_methods = [
                 m for m in t.methods
-                if m.return_type in ("Self", t.name) and not m.is_static and m.name.startswith("set") or m.name.startswith("with")
+                if m.return_type in ("Self", t.name) and not m.is_static and (m.name.startswith("set") or m.name.startswith("with"))
             ]
             if len(chain_methods) >= 2 or "Builder" in t.name:
                 score = 0.90 if "Builder" in t.name else 0.80

@@ -204,3 +204,127 @@ class MementoCodableSnapshotRule(BaseRule):
                     )
                 )
         return detections
+
+
+class ChainOfResponsibilityRule(BaseRule):
+    """Detects Chain of Responsibility pattern holding `next` handler pointer."""
+
+    def evaluate(self, model: CodeModel) -> list[Detection]:
+        detections: list[Detection] = []
+        for t in model.all_types:
+            has_next = any(
+                p.name in ("next", "nextHandler", "successor") or p.type_name in (t.name, f"{t.name}?") or "Handler" in p.type_name
+                for p in t.properties
+            )
+            if (has_next and "Handler" in t.name) or "Chain" in t.name:
+                evidences = [
+                    Evidence(
+                        rule_code="BEHAVIORAL_CHAIN_OF_RESPONSIBILITY",
+                        description=f"Type '{t.name}' implements Chain of Responsibility delegating unhandled requests along handler chain",
+                        weight=0.85,
+                        location=t.location,
+                    )
+                ]
+                detections.append(
+                    Detection(
+                        pattern_type=PatternType.CHAIN_OF_RESPONSIBILITY,
+                        pattern_category=PatternCategory.BEHAVIORAL,
+                        target_name=t.name,
+                        target_kind=t.kind,
+                        confidence=Confidence(score=0.85, evidences=evidences),
+                        primary_location=t.location,
+                        evidences=evidences,
+                    )
+                )
+        return detections
+
+
+class IteratorProtocolRule(BaseRule):
+    """Detects Iterator / Sequence traversal conforming to `IteratorProtocol` or `Sequence`."""
+
+    def evaluate(self, model: CodeModel) -> list[Detection]:
+        detections: list[Detection] = []
+        for t in model.all_types:
+            has_iterator = any(inh in ("IteratorProtocol", "Sequence", "AsyncSequence", "AsyncIteratorProtocol") for inh in t.inherited_types)
+            has_next_method = any(m.name == "next" for m in t.methods)
+            if has_iterator or has_next_method:
+                evidences = [
+                    Evidence(
+                        rule_code="BEHAVIORAL_ITERATOR_PROTOCOL",
+                        description=f"Type '{t.name}' conforms to Iterator / Sequence protocol for custom element traversal",
+                        weight=0.90,
+                        location=t.location,
+                    )
+                ]
+                detections.append(
+                    Detection(
+                        pattern_type=PatternType.ITERATOR_PROTOCOL,
+                        pattern_category=PatternCategory.BEHAVIORAL,
+                        target_name=t.name,
+                        target_kind=t.kind,
+                        confidence=Confidence(score=0.90, evidences=evidences),
+                        primary_location=t.location,
+                        evidences=evidences,
+                    )
+                )
+        return detections
+
+
+class MediatorCoordinatorRule(BaseRule):
+    """Detects Mediator / Coordinator pattern orchestrating UI flow or subsystem interaction."""
+
+    def evaluate(self, model: CodeModel) -> list[Detection]:
+        detections: list[Detection] = []
+        for t in model.all_types:
+            if "Coordinator" in t.name or "Mediator" in t.name:
+                evidences = [
+                    Evidence(
+                        rule_code="BEHAVIORAL_MEDIATOR_COORDINATOR",
+                        description=f"Type '{t.name}' acts as Mediator / Coordinator decoupling components and managing navigation flows",
+                        weight=0.85,
+                        location=t.location,
+                    )
+                ]
+                detections.append(
+                    Detection(
+                        pattern_type=PatternType.MEDIATOR_COORDINATOR,
+                        pattern_category=PatternCategory.BEHAVIORAL,
+                        target_name=t.name,
+                        target_kind=t.kind,
+                        confidence=Confidence(score=0.85, evidences=evidences),
+                        primary_location=t.location,
+                        evidences=evidences,
+                    )
+                )
+        return detections
+
+
+class VisitorPatternRule(BaseRule):
+    """Detects Visitor pattern via `accept(visitor:)` double dispatch."""
+
+    def evaluate(self, model: CodeModel) -> list[Detection]:
+        detections: list[Detection] = []
+        for t in model.all_types:
+            has_accept = any(m.name == "accept" and any("visitor" in p[0].lower() or "Visitor" in p[1] for p in m.parameters) for m in t.methods)
+            if has_accept or "Visitor" in t.name:
+                score = 0.90 if has_accept else 0.80
+                evidences = [
+                    Evidence(
+                        rule_code="BEHAVIORAL_VISITOR_PATTERN",
+                        description=f"Type '{t.name}' implements Visitor pattern enabling double dispatch operations",
+                        weight=score,
+                        location=t.location,
+                    )
+                ]
+                detections.append(
+                    Detection(
+                        pattern_type=PatternType.VISITOR_DOUBLE_DISPATCH,
+                        pattern_category=PatternCategory.BEHAVIORAL,
+                        target_name=t.name,
+                        target_kind=t.kind,
+                        confidence=Confidence(score=score, evidences=evidences),
+                        primary_location=t.location,
+                        evidences=evidences,
+                    )
+                )
+        return detections

@@ -24,6 +24,7 @@ from pattern_detector.domain.rules.declarative_dsl_rules import (
     ViewModifierPipelineRule,
 )
 from pattern_detector.domain.rules.creational_rules import (
+    AbstractFactoryRule,
     BuilderFluentChainRule,
     FactoryMethodRule,
     PrototypeClonableRule,
@@ -31,17 +32,24 @@ from pattern_detector.domain.rules.creational_rules import (
 )
 from pattern_detector.domain.rules.structural_rules import (
     AdapterViaExtensionRule,
+    BridgePatternRule,
     CompositeViewHierarchyRule,
     DecoratorWrapperRule,
     FacadeServiceRule,
+    FlyweightPatternRule,
+    ProxyPatternRule,
 )
 from pattern_detector.domain.rules.behavioral_rules import (
+    ChainOfResponsibilityRule,
     CommandEncapsulationRule,
     DelegatePatternWeakRule,
+    IteratorProtocolRule,
+    MediatorCoordinatorRule,
     MementoCodableSnapshotRule,
     ObserverCombinePublishedRule,
     StateEnumAssociatedValuesRule,
     StrategyProtocolInjectionRule,
+    VisitorPatternRule,
 )
 from pattern_detector.domain.rules.resilience_safety_rules import (
     ForceUnwrappingHazardRule,
@@ -81,25 +89,33 @@ DEFAULT_RULES: list[type[BaseRule]] = [
     KeyPathDynamicLookupRule,
     ViewModifierPipelineRule,
 
-    # 4. Creational
+    # 4. Creational (GoF)
     SingletonSharedInstanceRule,
     FactoryMethodRule,
+    AbstractFactoryRule,
     BuilderFluentChainRule,
     PrototypeClonableRule,
 
-    # 5. Structural
+    # 5. Structural (GoF)
     AdapterViaExtensionRule,
-    DecoratorWrapperRule,
+    BridgePatternRule,
     CompositeViewHierarchyRule,
+    DecoratorWrapperRule,
     FacadeServiceRule,
+    FlyweightPatternRule,
+    ProxyPatternRule,
 
-    # 6. Behavioral
-    DelegatePatternWeakRule,
-    ObserverCombinePublishedRule,
-    StrategyProtocolInjectionRule,
-    StateEnumAssociatedValuesRule,
+    # 6. Behavioral (GoF)
+    ChainOfResponsibilityRule,
     CommandEncapsulationRule,
+    DelegatePatternWeakRule,
+    IteratorProtocolRule,
+    MediatorCoordinatorRule,
     MementoCodableSnapshotRule,
+    ObserverCombinePublishedRule,
+    StateEnumAssociatedValuesRule,
+    StrategyProtocolInjectionRule,
+    VisitorPatternRule,
 
     # 7. Resilience & Hazards
     RetainCycleStrongSelfRule,
@@ -114,7 +130,7 @@ DEFAULT_RULES: list[type[BaseRule]] = [
     DynamicCastAsCascadeOcpRule,
     KissCyclomaticComplexityRule,
     KissLongParameterListRule,
-    DryDuplicateLogicLogic := DryDuplicateLogicRule,
+    DryDuplicateLogicRule,
     DemeterLawTrainWreckRule,
 ]
 
@@ -122,39 +138,62 @@ DEFAULT_RULES: list[type[BaseRule]] = [
 def get_default_rules() -> list[BaseRule]:
     """Instantiate and return the full suite of default Swift rules."""
     return [
+        # 1. POP
         ProtocolExtensionDefaultImplRule(),
         ProtocolCompositionRule(),
         AssociatedTypePatRule(),
         OpaqueReturnTypeRule(),
         ExistentialAnyBoxRule(),
+
+        # 2. Concurrency
         ActorModelIsolationRule(),
         MainActorUiBindingRule(),
         TaskGroupConcurrencyRule(),
         AsyncStreamSequenceRule(),
         SendableThreadSafetyRule(),
+
+        # 3. Declarative DSL
         PropertyWrapperPatternRule(),
         ResultBuilderDslRule(),
         KeyPathDynamicLookupRule(),
         ViewModifierPipelineRule(),
+
+        # 4. Creational (GoF)
         SingletonSharedInstanceRule(),
         FactoryMethodRule(),
+        AbstractFactoryRule(),
         BuilderFluentChainRule(),
         PrototypeClonableRule(),
+
+        # 5. Structural (GoF)
         AdapterViaExtensionRule(),
-        DecoratorWrapperRule(),
+        BridgePatternRule(),
         CompositeViewHierarchyRule(),
+        DecoratorWrapperRule(),
         FacadeServiceRule(),
-        DelegatePatternWeakRule(),
-        ObserverCombinePublishedRule(),
-        StrategyProtocolInjectionRule(),
-        StateEnumAssociatedValuesRule(),
+        FlyweightPatternRule(),
+        ProxyPatternRule(),
+
+        # 6. Behavioral (GoF)
+        ChainOfResponsibilityRule(),
         CommandEncapsulationRule(),
+        DelegatePatternWeakRule(),
+        IteratorProtocolRule(),
+        MediatorCoordinatorRule(),
         MementoCodableSnapshotRule(),
+        ObserverCombinePublishedRule(),
+        StateEnumAssociatedValuesRule(),
+        StrategyProtocolInjectionRule(),
+        VisitorPatternRule(),
+
+        # 7. Resilience
         RetainCycleStrongSelfRule(),
         ForceUnwrappingHazardRule(),
         StrongDelegateRetainCycleRule(),
         MainThreadBlockingCallRule(),
         UnhandledTrySwallowRule(),
+
+        # 8. SOLID & Quality
         MassiveViewControllerSrpRule(),
         FatProtocolIspRule(),
         DynamicCastAsCascadeOcpRule(),

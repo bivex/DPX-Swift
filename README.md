@@ -99,31 +99,42 @@ dpx-swift info retain_cycle_strong_self
 - `keypath_dynamic_lookup`: `@dynamicMemberLookup` with KeyPath subscripts.
 - `view_modifier_pipeline`: Composable `ViewModifier` decorators.
 
-### 4. 🏛️ Creational & Structural Patterns
+### 4. 🏛️ GoF Creational Patterns
 - `singleton_shared_instance`: Thread-safe `static let shared` with `private init()`.
 - `factory_method`: Static / polymorphic factory methods (`make...`, `create...`).
+- `abstract_factory`: Factory protocols declaring families of creation methods.
 - `builder_fluent_chain`: Fluent chaining returning `Self` or mutating structs.
+- `prototype_clonable`: Instance cloning via `NSCopying` / `clone()`.
+
+### 5. 🧱 GoF Structural Patterns
 - `adapter_via_extension`: Retroactive protocol adaptation via extensions.
-- `decorator_wrapper`: Decorator types wrapping underlying protocol instances.
-- `composite_view_hierarchy`: `@ViewBuilder` composite tree hierarchies.
-- `facade_service`: Unified coordinator orchestrating multiple subsystem repositories.
+- `bridge_implementor`: Decoupling abstraction from implementor protocols.
+- `composite_view_hierarchy`: Hierarchical tree / `@ViewBuilder` composite structures.
+- `decorator_wrapper`: Decorator types wrapping underlying conforming instances.
+- `facade_service`: Unified coordinator orchestrating multiple subsystem clients.
+- `flyweight_cache`: Sharing fine-grained immutable instances via pooling caches.
+- `proxy_virtual_or_remote`: Surrogate proxy controlling access to underlying targets.
 
-### 5. 🎯 Behavioral Patterns
-- `delegate_pattern_weak`: Safe `weak var delegate: ...Delegate?` contracts.
-- `observer_combine_published`: Combine `@Published` and `ObservableObject` reactive publishers.
-- `strategy_protocol_injection`: Interchangeable algorithm strategy injection.
-- `state_enum_associated_values`: Type-safe Enum State Machines with associated values.
+### 6. 🎯 GoF Behavioral Patterns
+- `chain_of_responsibility`: Linked handlers delegating requests along a chain.
 - `command_encapsulation`: Command objects with `execute()` / `undo()`.
+- `delegate_pattern_weak`: Safe `weak var delegate: ...Delegate?` contracts.
+- `iterator_protocol`: Custom traversal conforming to `IteratorProtocol` / `Sequence`.
+- `mediator_coordinator`: App Coordinators and Mediators managing UI flows.
 - `memento_codable_snapshot`: State capture via Codable snapshots.
+- `observer_combine_published`: Combine `@Published` and `ObservableObject` reactive publishers.
+- `state_enum_associated_values`: Type-safe Enum State Machines with associated values.
+- `strategy_protocol_injection`: Interchangeable algorithm strategy injection.
+- `visitor_double_dispatch`: Double dispatch operations via `accept(visitor:)`.
 
-### 6. 🛡️ Resilience, Hazards & Memory Safety
+### 7. 🛡️ Resilience, Hazards & Memory Safety
 - `retain_cycle_strong_self`: Escaping closures strongly capturing `self` without `[weak self]`.
 - `force_unwrapping_hazard`: Unsafe force-unwraps (`!`, `as!`, `try!`) causing fatal crashes.
 - `strong_delegate_retain_cycle`: Strong delegate properties missing `weak` modifier.
 - `main_thread_blocking_call`: Synchronous blocking calls (`Thread.sleep`) in UI contexts.
 - `unhandled_try_swallow`: Silent error discard via `try?` in critical paths.
 
-### 7. 📐 SOLID & Code Quality Principles
+### 8. 📐 SOLID & Code Quality Principles
 - `massive_view_controller_srp`: Massive View Controller / God Class SRP violations.
 - `fat_protocol_isp`: Fat protocols declaring too many required methods.
 - `dynamic_cast_as_cascade_ocp`: Dynamic `as?` casting cascades violating OCP.

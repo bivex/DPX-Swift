@@ -45,22 +45,30 @@ class PatternType(str, Enum):
     # 4. GoF Creational
     SINGLETON_SHARED_INSTANCE = "singleton_shared_instance"
     FACTORY_METHOD = "factory_method"
+    ABSTRACT_FACTORY = "abstract_factory"
     BUILDER_FLUENT_CHAIN = "builder_fluent_chain"
     PROTOTYPE_CLONABLE = "prototype_clonable"
 
     # 5. GoF Structural
     ADAPTER_VIA_EXTENSION = "adapter_via_extension"
-    DECORATOR_WRAPPER = "decorator_wrapper"
+    BRIDGE_IMPLEMENTOR = "bridge_implementor"
     COMPOSITE_VIEW_HIERARCHY = "composite_view_hierarchy"
+    DECORATOR_WRAPPER = "decorator_wrapper"
     FACADE_SERVICE = "facade_service"
+    FLYWEIGHT_CACHE = "flyweight_cache"
+    PROXY_VIRTUAL_OR_REMOTE = "proxy_virtual_or_remote"
 
     # 6. GoF Behavioral
-    DELEGATE_PATTERN_WEAK = "delegate_pattern_weak"
-    OBSERVER_COMBINE_PUBLISHED = "observer_combine_published"
-    STRATEGY_PROTOCOL_INJECTION = "strategy_protocol_injection"
-    STATE_ENUM_ASSOCIATED_VALUES = "state_enum_associated_values"
+    CHAIN_OF_RESPONSIBILITY = "chain_of_responsibility"
     COMMAND_ENCAPSULATION = "command_encapsulation"
+    DELEGATE_PATTERN_WEAK = "delegate_pattern_weak"
+    ITERATOR_PROTOCOL = "iterator_protocol"
+    MEDIATOR_COORDINATOR = "mediator_coordinator"
     MEMENTO_CODABLE_SNAPSHOT = "memento_codable_snapshot"
+    OBSERVER_COMBINE_PUBLISHED = "observer_combine_published"
+    STATE_ENUM_ASSOCIATED_VALUES = "state_enum_associated_values"
+    STRATEGY_PROTOCOL_INJECTION = "strategy_protocol_injection"
+    VISITOR_DOUBLE_DISPATCH = "visitor_double_dispatch"
 
     # 7. Resilience, Memory Safety & Hazards
     RETAIN_CYCLE_STRONG_SELF = "retain_cycle_strong_self"

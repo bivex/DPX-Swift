@@ -139,6 +139,13 @@ PATTERN_CATALOG: dict[PatternType, PatternDefinition] = {
         description="Static or protocol-based factory method for instantiating polymorphic types.",
         gof_equivalent="Factory Method",
     ),
+    PatternType.ABSTRACT_FACTORY: PatternDefinition(
+        type=PatternType.ABSTRACT_FACTORY,
+        category=PatternCategory.CREATIONAL,
+        name="Abstract Factory",
+        description="Factory protocol declaring creation methods for families of related or dependent objects.",
+        gof_equivalent="Abstract Factory",
+    ),
     PatternType.BUILDER_FLUENT_CHAIN: PatternDefinition(
         type=PatternType.BUILDER_FLUENT_CHAIN,
         category=PatternCategory.CREATIONAL,
@@ -162,12 +169,12 @@ PATTERN_CATALOG: dict[PatternType, PatternDefinition] = {
         description="Retroactive modeling adopting third-party or system types to domain protocols via extensions.",
         gof_equivalent="Adapter",
     ),
-    PatternType.DECORATOR_WRAPPER: PatternDefinition(
-        type=PatternType.DECORATOR_WRAPPER,
+    PatternType.BRIDGE_IMPLEMENTOR: PatternDefinition(
+        type=PatternType.BRIDGE_IMPLEMENTOR,
         category=PatternCategory.STRUCTURAL,
-        name="Decorator / Wrapper Type",
-        description="Struct or class wrapping an underlying conforming instance to inject supplementary behavior.",
-        gof_equivalent="Decorator",
+        name="Bridge Pattern",
+        description="Decouples an abstraction from its implementation by delegating to a separate implementor protocol.",
+        gof_equivalent="Bridge",
     ),
     PatternType.COMPOSITE_VIEW_HIERARCHY: PatternDefinition(
         type=PatternType.COMPOSITE_VIEW_HIERARCHY,
@@ -176,6 +183,13 @@ PATTERN_CATALOG: dict[PatternType, PatternDefinition] = {
         description="Hierarchical tree composite grouping child views and components uniformly.",
         gof_equivalent="Composite",
     ),
+    PatternType.DECORATOR_WRAPPER: PatternDefinition(
+        type=PatternType.DECORATOR_WRAPPER,
+        category=PatternCategory.STRUCTURAL,
+        name="Decorator / Wrapper Type",
+        description="Struct or class wrapping an underlying conforming instance to inject supplementary behavior.",
+        gof_equivalent="Decorator",
+    ),
     PatternType.FACADE_SERVICE: PatternDefinition(
         type=PatternType.FACADE_SERVICE,
         category=PatternCategory.STRUCTURAL,
@@ -183,35 +197,28 @@ PATTERN_CATALOG: dict[PatternType, PatternDefinition] = {
         description="Unified simplified entry point coordinating multiple low-level subsystems, repositories, or APIs.",
         gof_equivalent="Facade",
     ),
+    PatternType.FLYWEIGHT_CACHE: PatternDefinition(
+        type=PatternType.FLYWEIGHT_CACHE,
+        category=PatternCategory.STRUCTURAL,
+        name="Flyweight Cache",
+        description="Sharing fine-grained immutable instances via factory pooling / dictionary cache to minimize memory.",
+        gof_equivalent="Flyweight",
+    ),
+    PatternType.PROXY_VIRTUAL_OR_REMOTE: PatternDefinition(
+        type=PatternType.PROXY_VIRTUAL_OR_REMOTE,
+        category=PatternCategory.STRUCTURAL,
+        name="Proxy Pattern",
+        description="Surrogate or placeholder object controlling access to an underlying resource or remote endpoint.",
+        gof_equivalent="Proxy",
+    ),
 
     # 6. Behavioral
-    PatternType.DELEGATE_PATTERN_WEAK: PatternDefinition(
-        type=PatternType.DELEGATE_PATTERN_WEAK,
+    PatternType.CHAIN_OF_RESPONSIBILITY: PatternDefinition(
+        type=PatternType.CHAIN_OF_RESPONSIBILITY,
         category=PatternCategory.BEHAVIORAL,
-        name="Weak Delegate Pattern",
-        description="One-to-one delegation contract holding a `weak` reference to prevent retain cycles.",
-        gof_equivalent="Observer / Mediator",
-    ),
-    PatternType.OBSERVER_COMBINE_PUBLISHED: PatternDefinition(
-        type=PatternType.OBSERVER_COMBINE_PUBLISHED,
-        category=PatternCategory.BEHAVIORAL,
-        name="Combine @Published / Observable",
-        description="Reactive observer publisher notifying subscribed observers upon state mutations.",
-        gof_equivalent="Observer",
-    ),
-    PatternType.STRATEGY_PROTOCOL_INJECTION: PatternDefinition(
-        type=PatternType.STRATEGY_PROTOCOL_INJECTION,
-        category=PatternCategory.BEHAVIORAL,
-        name="Strategy Protocol / Closure Injection",
-        description="Interchangeable algorithm strategy encapsulated in protocol abstraction or closure property.",
-        gof_equivalent="Strategy",
-    ),
-    PatternType.STATE_ENUM_ASSOCIATED_VALUES: PatternDefinition(
-        type=PatternType.STATE_ENUM_ASSOCIATED_VALUES,
-        category=PatternCategory.BEHAVIORAL,
-        name="Enum State Machine with Associated Values",
-        description="Type-safe finite state machine modeling distinct lifecycle states with payload data.",
-        gof_equivalent="State",
+        name="Chain of Responsibility",
+        description="Sequence of handler objects processing a request or passing it to the next handler in the chain.",
+        gof_equivalent="Chain of Responsibility",
     ),
     PatternType.COMMAND_ENCAPSULATION: PatternDefinition(
         type=PatternType.COMMAND_ENCAPSULATION,
@@ -220,12 +227,61 @@ PATTERN_CATALOG: dict[PatternType, PatternDefinition] = {
         description="Encapsulates an operation, its receiver, and parameters into an executable command object.",
         gof_equivalent="Command",
     ),
+    PatternType.DELEGATE_PATTERN_WEAK: PatternDefinition(
+        type=PatternType.DELEGATE_PATTERN_WEAK,
+        category=PatternCategory.BEHAVIORAL,
+        name="Weak Delegate Pattern",
+        description="One-to-one delegation contract holding a `weak` reference to prevent retain cycles.",
+        gof_equivalent="Observer / Mediator",
+    ),
+    PatternType.ITERATOR_PROTOCOL: PatternDefinition(
+        type=PatternType.ITERATOR_PROTOCOL,
+        category=PatternCategory.BEHAVIORAL,
+        name="Iterator Protocol / Sequence",
+        description="Sequential element traversal conforming to `IteratorProtocol` or `Sequence`.",
+        gof_equivalent="Iterator",
+    ),
+    PatternType.MEDIATOR_COORDINATOR: PatternDefinition(
+        type=PatternType.MEDIATOR_COORDINATOR,
+        category=PatternCategory.BEHAVIORAL,
+        name="Mediator / App Coordinator",
+        description="Centralized coordinator orchestrating navigation and interactions between disparate components.",
+        gof_equivalent="Mediator",
+    ),
     PatternType.MEMENTO_CODABLE_SNAPSHOT: PatternDefinition(
         type=PatternType.MEMENTO_CODABLE_SNAPSHOT,
         category=PatternCategory.BEHAVIORAL,
         name="Codable Memento Snapshot",
         description="Captures and externalizes an object's internal state into a Codable snapshot without violating encapsulation.",
         gof_equivalent="Memento",
+    ),
+    PatternType.OBSERVER_COMBINE_PUBLISHED: PatternDefinition(
+        type=PatternType.OBSERVER_COMBINE_PUBLISHED,
+        category=PatternCategory.BEHAVIORAL,
+        name="Combine @Published / Observable",
+        description="Reactive observer publisher notifying subscribed observers upon state mutations.",
+        gof_equivalent="Observer",
+    ),
+    PatternType.STATE_ENUM_ASSOCIATED_VALUES: PatternDefinition(
+        type=PatternType.STATE_ENUM_ASSOCIATED_VALUES,
+        category=PatternCategory.BEHAVIORAL,
+        name="Enum State Machine with Associated Values",
+        description="Type-safe finite state machine modeling distinct lifecycle states with payload data.",
+        gof_equivalent="State",
+    ),
+    PatternType.STRATEGY_PROTOCOL_INJECTION: PatternDefinition(
+        type=PatternType.STRATEGY_PROTOCOL_INJECTION,
+        category=PatternCategory.BEHAVIORAL,
+        name="Strategy Protocol / Closure Injection",
+        description="Interchangeable algorithm strategy encapsulated in protocol abstraction or closure property.",
+        gof_equivalent="Strategy",
+    ),
+    PatternType.VISITOR_DOUBLE_DISPATCH: PatternDefinition(
+        type=PatternType.VISITOR_DOUBLE_DISPATCH,
+        category=PatternCategory.BEHAVIORAL,
+        name="Visitor Double Dispatch",
+        description="Separates an algorithm from the object structure on which it operates via `accept(visitor:)` dispatch.",
+        gof_equivalent="Visitor",
     ),
 
     # 7. Resilience, Safety & Hazards
