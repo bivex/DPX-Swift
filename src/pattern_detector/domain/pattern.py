@@ -113,7 +113,7 @@ PATTERN_CATALOG: dict[PatternType, PatternDefinition] = {
         type=PatternType.KEYPATH_DYNAMIC_LOOKUP,
         category=PatternCategory.DECLARATIVE_DSL,
         name="KeyPath Dynamic Member Lookup",
-        description="Type-safe property forwarding and dynamic member resolution using `\Type.property` KeyPaths.",
+        description=r"Type-safe property forwarding and dynamic member resolution using `\Type.property` KeyPaths.",
         gof_equivalent="Dynamic Proxy / Property Accessor",
     ),
     PatternType.VIEW_MODIFIER_PIPELINE: PatternDefinition(

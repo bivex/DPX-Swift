@@ -34,6 +34,7 @@ class SwiftMethod:
     is_mutating: bool = False
     is_async: bool = False
     is_throwing: bool = False
+    is_private: bool = False
     attributes: list[str] = field(default_factory=list)  # e.g. ["@MainActor", "@Sendable"]
     body: str = ""
     branch_count: int = 1

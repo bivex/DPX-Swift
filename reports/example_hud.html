@@ -1,0 +1,1104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pattern Scanner Report - DPX-Swift Architecture HUD - /Volumes/External/Code/DPX-Swift/examples/clean_ios_architecture</title>
+    <style>
+        :root {
+            --bg: #090d13;
+            --card-bg: #121822;
+            --border: #232d3d;
+            --text: #cbd5e1;
+            --heading: #f8fafc;
+            --accent: #f97316;
+            --green: #22c55e;
+            --cyan: #0ea5e9;
+            --yellow: #f59e0b;
+            --red: #ef4444;
+            --swift-orange: #ff5238;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, monospace, sans-serif; }
+        body { background: var(--bg); color: var(--text); padding: 30px 20px; line-height: 1.5; }
+        .container { max-width: 1280px; margin: 0 auto; }
+        
+        header { 
+            border-bottom: 1px solid var(--border); 
+            padding-bottom: 20px; 
+            margin-bottom: 25px; 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: flex-start;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+        h1 { color: var(--heading); font-size: 26px; display: flex; align-items: center; gap: 10px; }
+        .subtitle { color: #94a3b8; font-size: 14px; margin-top: 5px; }
+        
+        .header-actions { display: flex; gap: 10px; align-items: center; }
+        .btn-ai-context {
+            background: linear-gradient(135deg, #f97316 0%, #ef4444 100%);
+            color: #ffffff;
+            border: none;
+            padding: 10px 18px;
+            border-radius: 8px;
+            font-weight: 700;
+            font-size: 13.5px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            box-shadow: 0 4px 14px rgba(249, 115, 22, 0.35);
+            transition: transform 0.15s, box-shadow 0.15s;
+        }
+        .btn-ai-context:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(249, 115, 22, 0.5);
+        }
+        .btn-view-prompt {
+            background: var(--card-bg);
+            color: var(--heading);
+            border: 1px solid var(--border);
+            padding: 10px 14px;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 13px;
+            cursor: pointer;
+            transition: all 0.15s;
+        }
+        .btn-view-prompt:hover {
+            border-color: var(--swift-orange);
+            color: var(--swift-orange);
+        }
+
+        .kpi-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-bottom: 25px; }
+        .kpi-card { background: var(--card-bg); border: 1px solid var(--border); border-radius: 8px; padding: 18px; }
+        .kpi-title { font-size: 12px; text-transform: uppercase; color: #94a3b8; font-weight: 600; letter-spacing: 0.5px; }
+        .kpi-value { font-size: 28px; font-weight: 700; color: var(--heading); margin-top: 5px; }
+
+        .category-filters { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 20px; align-items: center; }
+        .cat-filter-btn { padding: 8px 14px; border-radius: 20px; border: 1px solid var(--border); background: var(--card-bg); color: var(--heading); font-size: 13px; cursor: pointer; display: flex; align-items: center; gap: 8px; transition: transform 0.1s, opacity 0.2s; }
+        .cat-filter-btn:hover { transform: translateY(-1px); opacity: 0.9; }
+        .cat-dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; }
+        .btn-all { background: #1e293b; color: #f8fafc; border-color: #475569; }
+
+        .search-bar { width: 100%; padding: 14px 18px; background: var(--card-bg); border: 1px solid var(--border); border-radius: 8px; color: var(--heading); font-size: 14px; margin-bottom: 25px; outline: none; transition: border-color 0.2s; }
+        .search-bar:focus { border-color: var(--swift-orange); }
+
+        .pattern-card { background: var(--card-bg); border: 1px solid var(--border); border-radius: 8px; margin-bottom: 15px; overflow: hidden; transition: border-color 0.2s, box-shadow 0.2s; }
+        .pattern-card:hover { border-color: #f9731688; box-shadow: 0 4px 20px rgba(0,0,0,0.3); }
+        .card-header { background: #17202e; padding: 12px 18px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; border-bottom: 1px solid var(--border); }
+        .header-left { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+        .header-right { display: flex; align-items: center; gap: 10px; }
+        .card-index { color: #64748b; font-weight: 700; font-size: 13px; }
+        
+        .category-badge { padding: 3px 8px; border-radius: 4px; font-weight: 700; font-size: 11px; letter-spacing: 0.5px; }
+        .pattern-badge { padding: 3px 8px; border-radius: 4px; font-weight: 700; font-size: 12px; }
+        .target-name { color: var(--heading); font-size: 14px; }
+        
+        .confidence-badge { font-size: 12px; font-weight: 700; padding: 4px 10px; border-radius: 20px; }
+        .badge-vh { background: #14532d55; color: #4ade80; border: 1px solid #22c55e; }
+        .badge-h { background: #0c4a6e55; color: #38bdf8; border: 1px solid #0284c7; }
+        .badge-m { background: #78350f55; color: #fbbf24; border: 1px solid #d97706; }
+        .badge-l { background: #7f1d1d55; color: #f87171; border: 1px solid #dc2626; }
+
+        .btn-copy-card-ai {
+            background: rgba(249, 115, 22, 0.15);
+            color: #fb923c;
+            border: 1px solid rgba(249, 115, 22, 0.35);
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-size: 11.5px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.15s;
+        }
+        .btn-copy-card-ai:hover {
+            background: rgba(249, 115, 22, 0.3);
+            color: #ffffff;
+            border-color: #f97316;
+        }
+
+        .card-body { padding: 16px 18px; font-size: 13px; }
+        .summary-text { margin-bottom: 10px; color: #e2e8f0; font-size: 14px; }
+        .primary-loc { margin-bottom: 12px; color: #94a3b8; }
+        code { background: #0b0f17; padding: 3px 6px; border-radius: 4px; font-family: ui-monospace, SFMono-Regular, Menlo, monospace; color: #fdba74; border: 1px solid #1e293b; }
+
+        .evidence-section { margin-top: 14px; }
+        .evidence-list { list-style: none; margin-top: 8px; }
+        .evidence-item { margin-bottom: 7px; padding-left: 12px; border-left: 3px solid; }
+        .weight-tag { font-weight: 700; font-family: monospace; font-size: 13px; }
+        .rule-code { color: #94a3b8; font-size: 11px; font-family: monospace; }
+        .location-tag { color: #fdba74; font-size: 11px; margin-left: 6px; }
+        .related-locs { margin-top: 12px; color: #94a3b8; }
+        .related-locs ul { margin-left: 20px; margin-top: 4px; }
+
+        /* Toast notification */
+        .toast {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            background: #10b981;
+            color: #ffffff;
+            padding: 14px 22px;
+            border-radius: 8px;
+            font-weight: 700;
+            font-size: 14px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+            pointer-events: none;
+            z-index: 9999;
+        }
+        .toast.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Modal Preview */
+        .modal-overlay {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0, 0, 0, 0.75);
+            backdrop-filter: blur(4px);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 9998;
+            padding: 20px;
+        }
+        .modal-box {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            width: 100%;
+            max-width: 900px;
+            max-height: 85vh;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.6);
+        }
+        .modal-header {
+            padding: 18px 22px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .modal-title { color: var(--heading); font-size: 18px; font-weight: 700; }
+        .modal-close { background: none; border: none; color: #94a3b8; font-size: 24px; cursor: pointer; }
+        .modal-body { padding: 20px 22px; overflow-y: auto; flex: 1; }
+        .prompt-textarea {
+            width: 100%;
+            height: 400px;
+            background: #090d13;
+            color: #fdba74;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 16px;
+            font-family: ui-monospace, monospace;
+            font-size: 12.5px;
+            line-height: 1.4;
+            resize: vertical;
+            outline: none;
+        }
+        .modal-footer {
+            padding: 16px 22px;
+            border-top: 1px solid var(--border);
+            display: flex;
+            justify-content: flex-end;
+            gap: 12px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div>
+                <h1>🍏 DPX-Swift Architecture & Concurrency Observability HUD</h1>
+                <div class="subtitle">Protocol-Oriented Programming, Actor Concurrency & SwiftUI Engine • Target: <code>/Volumes/External/Code/DPX-Swift/examples/clean_ios_architecture</code></div>
+            </div>
+            <div class="header-actions">
+                <button class="btn-view-prompt" onclick="openPromptModal()">👁️ View AI Context</button>
+                <button class="btn-ai-context" onclick="copyFullAiContext()">🤖 Copy AI Context Prompt</button>
+            </div>
+        </header>
+
+        <div class="kpi-grid">
+            <div class="kpi-card">
+                <div class="kpi-title">Total Detections</div>
+                <div class="kpi-value">19</div>
+            </div>
+            <div class="kpi-card">
+                <div class="kpi-title">High Confidence (≥70%)</div>
+                <div class="kpi-value" style="color: #4ade80;">19</div>
+            </div>
+            <div class="kpi-card">
+                <div class="kpi-title">Med / Low (<70%)</div>
+                <div class="kpi-value" style="color: #fbbf24;">0</div>
+            </div>
+            <div class="kpi-card">
+                <div class="kpi-title">Files Scanned</div>
+                <div class="kpi-value">6</div>
+            </div>
+            <div class="kpi-card">
+                <div class="kpi-title">Scan Duration</div>
+                <div class="kpi-value">0.001s</div>
+            </div>
+        </div>
+
+        <div class="category-filters">
+            <button class="cat-filter-btn btn-all" data-filter="all"><strong>All Categories</strong>: 19</button>
+            
+                    <button class="cat-filter-btn" data-filter="protocol_oriented" style="border-color: #0284c7; background: #0c4a6e44; color: #38bdf8;">
+                        <span class="cat-dot" style="background: #0ea5e9;"></span>
+                        <strong>Protocol-Oriented</strong>: 4
+                    </button>
+                    
+                    <button class="cat-filter-btn" data-filter="concurrency" style="border-color: #e11d48; background: #88133744; color: #fb7185;">
+                        <span class="cat-dot" style="background: #f43f5e;"></span>
+                        <strong>Concurrency & Actors</strong>: 7
+                    </button>
+                    
+                    <button class="cat-filter-btn" data-filter="declarative_dsl" style="border-color: #9333ea; background: #581c8744; color: #c084fc;">
+                        <span class="cat-dot" style="background: #a855f7;"></span>
+                        <strong>SwiftUI & DSL</strong>: 1
+                    </button>
+                    
+                    <button class="cat-filter-btn" data-filter="creational" style="border-color: #059669; background: #064e3b44; color: #34d399;">
+                        <span class="cat-dot" style="background: #10b981;"></span>
+                        <strong>Creational</strong>: 1
+                    </button>
+                    
+                    <button class="cat-filter-btn" data-filter="structural" style="border-color: #0891b2; background: #164e6344; color: #67e8f9;">
+                        <span class="cat-dot" style="background: #06b6d4;"></span>
+                        <strong>Structural</strong>: 2
+                    </button>
+                    
+                    <button class="cat-filter-btn" data-filter="behavioral" style="border-color: #d97706; background: #78350f44; color: #fbbf24;">
+                        <span class="cat-dot" style="background: #f59e0b;"></span>
+                        <strong>Behavioral</strong>: 4
+                    </button>
+                    
+        </div>
+
+        <input type="text" id="searchInput" class="search-bar" placeholder="🔎 Instant search by pattern name, category, target type, or rule (e.g. actor, mainactor, propertywrapper, retaincycle)...">
+
+        <div id="cardsContainer">
+            
+                <div class="pattern-card" data-pattern="protocol_extension_default_impl" data-category="protocol_oriented" data-target="RepositoryProtocol" style="border-left: 4px solid #0ea5e9;">
+                    <div class="card-header">
+                        <div class="header-left">
+                            <span class="card-index">#1</span>
+                            <span class="category-badge" style="color: #38bdf8; background: #0c4a6e44; border: 1px solid #0284c7;">
+                                PROTOCOL-ORIENTED
+                            </span>
+                            <span class="pattern-badge" style="color: #38bdf8; background: #0c4a6e44; border: 1px solid #0284c7;">
+                                PROTOCOL_EXTENSION_DEFAULT_IMPL
+                            </span>
+                            <span class="target-name">protocol_extension: <strong>RepositoryProtocol</strong></span>
+                        </div>
+                        <div class="header-right">
+                            <span class="confidence-badge badge-vh">90% [VERY_HIGH]</span>
+                            <button class="btn-copy-card-ai" onclick='copySingleAiPrompt("Refactor and review the following Swift pattern/violation:\n- Pattern: protocol_extension_default_impl (Protocol-Oriented)\n- Target: RepositoryProtocol (protocol_extension)\n- Location: /Volumes/External/Code/DPX-Swift/examples/clean_ios_architecture/Protocols/RepositoryProtocol.swift:16:1\n- Summary: Extension on protocol 'RepositoryProtocol' provides default implementation for 1 method(s): all\n\nPlease provide an idiomatic Swift 5.5 - 6.0+ clean architecture refactoring adhering to POP, Concurrency, and SOLID principles.")' title="Copy AI Refactoring Prompt">🤖 Copy for AI</button>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <p class="summary-text"><strong>Summary:</strong> Extension on protocol &#x27;RepositoryProtocol&#x27; provides default implementation for 1 method(s): all</p>
+                        <p class="primary-loc"><strong>Primary Location:</strong> <code>/Volumes/External/Code/DPX-Swift/examples/clean_ios_architecture/Protocols/RepositoryProtocol.swift:16:1</code></p>
+                        <div class="evidence-section">
+                            <strong>Evidence Trail (1 heuristics):</strong>
+                            <ul class="evidence-list">
+                                <li class="evidence-item" style="border-left-color: #0ea5e9;"><span class="weight-tag" style="color: #38bdf8;">+90%</span> <span class="rule-code">[POP_PROTOCOL_EXTENSION_DEFAULT_IMPL]</span> Extension on protocol &#x27;RepositoryProtocol&#x27; provides default implementation for 1 method(s): all <span class="location-tag">📍 /Volumes/External/Code/DPX-Swift/examples/clean_ios_architecture/Protocols/RepositoryProtocol.swift:16:1</span></li>
+                            </ul>
+                        </div>
+                        
+                    </div>
+                </div>
+                
+                <div class="pattern-card" data-pattern="associated_type_pat" data-category="protocol_oriented" data-target="EntityProtocol" style="border-left: 4px solid #0ea5e9;">
+                    <div class="card-header">
+                        <div class="header-left">
+                            <span class="card-index">#2</span>
+                            <span class="category-badge" style="color: #38bdf8; background: #0c4a6e44; border: 1px solid #0284c7;">
+                                PROTOCOL-ORIENTED
+                            </span>
+                            <span class="pattern-badge" style="color: #38bdf8; background: #0c4a6e44; border: 1px solid #0284c7;">
+                                ASSOCIATED_TYPE_PAT
+                            </span>
+                            <span class="target-name">protocol: <strong>EntityProtocol</strong></span>
+                        </div>
+                        <div class="header-right">
+                            <span class="confidence-badge badge-vh">90% [VERY_HIGH]</span>
+                            <button class="btn-copy-card-ai" onclick='copySingleAiPrompt("Refactor and review the following Swift pattern/violation:\n- Pattern: associated_type_pat (Protocol-Oriented)\n- Target: EntityProtocol (protocol)\n- Location: /Volumes/External/Code/DPX-Swift/examples/clean_ios_architecture/Protocols/RepositoryProtocol.swift:3:1\n- Summary: Protocol 'EntityProtocol' defines associated type(s) (ID), enabling generic protocol abstraction\n\nPlease provide an idiomatic Swift 5.5 - 6.0+ clean architecture refactoring adhering to POP, Concurrency, and SOLID principles.")' title="Copy AI Refactoring Prompt">🤖 Copy for AI</button>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <p class="summary-text"><strong>Summary:</strong> Protocol &#x27;EntityProtocol&#x27; defines associated type(s) (ID), enabling generic protocol abstraction</p>
+                        <p class="primary-loc"><strong>Primary Location:</strong> <code>/Volumes/External/Code/DPX-Swift/examples/clean_ios_architecture/Protocols/RepositoryProtocol.swift:3:1</code></p>
+                        <div class="evidence-section">
+                            <strong>Evidence Trail (1 heuristics):</strong>
+                            <ul class="evidence-list">
+                                <li class="evidence-item" style="border-left-color: #0ea5e9;"><span class="weight-tag" style="color: #38bdf8;">+90%</span> <span class="rule-code">[POP_ASSOCIATED_TYPE_PAT]</span> Protocol &#x27;EntityProtocol&#x27; defines associated type(s) (ID), enabling generic protocol abstraction <span class="location-tag">📍 /Volumes/External/Code/DPX-Swift/examples/clean_ios_architecture/Protocols/RepositoryProtocol.swift:3:1</span></li>
+                            </ul>
+                        </div>
+                        
+                    </div>
+                </div>
+                
+                <div class="pattern-card" data-pattern="associated_type_pat" data-category="protocol_oriented" data-target="RepositoryProtocol" style="border-left: 4px solid #0ea5e9;">
+                    <div class="card-header">
+                        <div class="header-left">
+                            <span class="card-index">#3</span>
+                            <span class="category-badge" style="color: #38bdf8; background: #0c4a6e44; border: 1px solid #0284c7;">
+                                PROTOCOL-ORIENTED
+                            </span>
+                            <span class="pattern-badge" style="color: #38bdf8; background: #0c4a6e44; border: 1px solid #0284c7;">
+                                ASSOCIATED_TYPE_PAT
+                            </span>
+                            <span class="target-name">protocol: <strong>RepositoryProtocol</strong></span>
+                        </div>
+                        <div class="header-right">
+                            <span class="confidence-badge badge-vh">90% [VERY_HIGH]</span>
+                            <button class="btn-copy-card-ai" onclick='copySingleAiPrompt("Refactor and review the following Swift pattern/violation:\n- Pattern: associated_type_pat (Protocol-Oriented)\n- Target: RepositoryProtocol (protocol)\n- Location: /Volumes/External/Code/DPX-Swift/examples/clean_ios_architecture/Protocols/RepositoryProtocol.swift:8:1\n- Summary: Protocol 'RepositoryProtocol' defines associated type(s) (Entity), enabling generic protocol abstraction\n\nPlease provide an idiomatic Swift 5.5 - 6.0+ clean architecture refactoring adhering to POP, Concurrency, and SOLID principles.")' title="Copy AI Refactoring Prompt">🤖 Copy for AI</button>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <p class="summary-text"><strong>Summary:</strong> Protocol &#x27;RepositoryProtocol&#x27; defines associated type(s) (Entity), enabling generic protocol abstraction</p>
+                        <p class="primary-loc"><strong>Primary Location:</strong> <code>/Volumes/External/Code/DPX-Swift/examples/clean_ios_architecture/Protocols/RepositoryProtocol.swift:8:1</code></p>
+                        <div class="evidence-section">
+                            <strong>Evidence Trail (1 heuristics):</strong>
+                            <ul class="evidence-list">
+                                <li class="evidence-item" style="border-left-color: #0ea5e9;"><span class="weight-tag" style="color: #38bdf8;">+90%</span> <span class="rule-code">[POP_ASSOCIATED_TYPE_PAT]</span> Protocol &#x27;RepositoryProtocol&#x27; defines associated type(s) (Entity), enabling generic protocol abstraction <span class="location-tag">📍 /Volumes/External/Code/DPX-Swift/examples/clean_ios_architecture/Protocols/RepositoryProtocol.swift:8:1</span></li>
+                            </ul>
+                        </div>
+                        
+                    </div>
+                </div>
+                
+                <div class="pattern-card" data-pattern="opaque_return_type" data-category="protocol_oriented" data-target="body" style="border-left: 4px solid #0ea5e9;">
+                    <div class="card-header">
+                        <div class="header-left">
+                            <span class="card-index">#4</span>
+                            <span class="category-badge" style="color: #38bdf8; background: #0c4a6e44; border: 1px solid #0284c7;">
+                                PROTOCOL-ORIENTED
+                            </span>
+                            <span class="pattern-badge" style="color: #38bdf8; background: #0c4a6e44; border: 1px solid #0284c7;">
+                                OPAQUE_RETURN_TYPE
+                            </span>
+                            <span class="target-name">method: <strong>body</strong></span>
+                        </div>
+                        <div class="header-right">
+                            <span class="confidence-badge badge-vh">85% [VERY_HIGH]</span>
+                            <button class="btn-copy-card-ai" onclick='copySingleAiPrompt("Refactor and review the following Swift pattern/violation:\n- Pattern: opaque_return_type (Protocol-Oriented)\n- Target: body (method)\n- Location: /Volumes/External/Code/DPX-Swift/examples/clean_ios_architecture/Views/ProfileView.swift:4:1\n- Summary: Method 'body' returns opaque type 'some View', hiding concrete type implementation while preserving type identity\n\nPlease provide an idiomatic Swift 5.5 - 6.0+ clean architecture refactoring adhering to POP, Concurrency, and SOLID principles.")' title="Copy AI Refactoring Prompt">🤖 Copy for AI</button>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <p class="summary-text"><strong>Summary:</strong> Method &#x27;body&#x27; returns opaque type &#x27;some View&#x27;, hiding concrete type implementation while preserving type identity</p>
+                        <p class="primary-loc"><strong>Primary Location:</strong> <code>/Volumes/External/Code/DPX-Swift/examples/clean_ios_architecture/Views/ProfileView.swift:4:1</code></p>
+                        <div class="evidence-section">
+                            <strong>Evidence Trail (1 heuristics):</strong>
+                            <ul class="evidence-list">
+                                <li class="evidence-item" style="border-left-color: #0ea5e9;"><span class="weight-tag" style="color: #38bdf8;">+85%</span> <span class="rule-code">[POP_OPAQUE_RETURN_TYPE]</span> Method &#x27;body&#x27; returns opaque type &#x27;some View&#x27;, hiding concrete type implementation while preserving type identity <span class="location-tag">📍 /Volumes/External/Code/DPX-Swift/examples/clean_ios_architecture/Views/ProfileView.swift:4:1</span></li>
+                            </ul>
+                        </div>
+                        
+                    </div>
+                </div>
+                
+                <div class="pattern-card" data-pattern="actor_model_isolation" data-category="concurrency" data-target="AccountDataStore" style="border-left: 4px solid #f43f5e;">
+                    <div class="card-header">
+                        <div class="header-left">
+                            <span class="card-index">#5</span>
+                            <span class="category-badge" style="color: #fb7185; background: #88133744; border: 1px solid #e11d48;">
+                                CONCURRENCY &amp; ACTORS
+                            </span>
+                            <span class="pattern-badge" style="color: #fb7185; background: #88133744; border: 1px solid #e11d48;">
+                                ACTOR_MODEL_ISOLATION
+                            </span>
+                            <span class="target-name">actor: <strong>AccountDataStore</strong></span>
+                        </div>
+                        <div class="header-right">
+                            <span class="confidence-badge badge-vh">95% [VERY_HIGH]</span>
+                            <button class="btn-copy-card-ai" onclick='copySingleAiPrompt("Refactor and review the following Swift pattern/violation:\n- Pattern: actor_model_isolation (Concurrency & Actors)\n- Target: AccountDataStore (actor)\n- Location: /Volumes/External/Code/DPX-Swift/examples/clean_ios_architecture/Services/AccountDataStore.swift:9:1\n- Summary: Actor 'AccountDataStore' guarantees data isolation and thread safety via the Swift Actor model\n\nPlease provide an idiomatic Swift 5.5 - 6.0+ clean architecture refactoring adhering to POP, Concurrency, and SOLID principles.")' title="Copy AI Refactoring Prompt">🤖 Copy for AI</button>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <p class="summary-text"><strong>Summary:</strong> Actor &#x27;AccountDataStore&#x27; guarantees data isolation and thread safety via the Swift Actor model</p>
+                        <p class="primary-loc"><strong>Primary Location:</strong> <code>/Volumes/External/Code/DPX-Swift/examples/clean_ios_architecture/Services/AccountDataStore.swift:9:1</code></p>
+                        <div class="evidence-section">
+                            <strong>Evidence Trail (1 heuristics):</strong>
+                            <ul class="evidence-list">
+                                <li class="evidence-item" style="border-left-color: #f43f5e;"><span class="weight-tag" style="color: #fb7185;">+95%</span> <span class="rule-code">[CONCURRENCY_ACTOR_ISOLATION]</span> Actor &#x27;AccountDataStore&#x27; guarantees data isolation and thread safety via the Swift Actor model <span class="location-tag">📍 /Volumes/External/Code/DPX-Swift/examples/clean_ios_architecture/Services/AccountDataStore.swift:9:1</span></li>
+                            </ul>
+                        </div>
+                        
+                    </div>
+                </div>
+                
+                <div class="pattern-card" data-pattern="main_actor_ui_binding" data-category="concurrency" data-target="UserViewModel" style="border-left: 4px solid #f43f5e;">
+                    <div class="card-header">
+                        <div class="header-left">
+                            <span class="card-index">#6</span>
+                            <span class="category-badge" style="color: #fb7185; background: #88133744; border: 1px solid #e11d48;">
+                                CONCURRENCY &amp; ACTORS
+                            </span>
+                            <span class="pattern-badge" style="color: #fb7185; background: #88133744; border: 1px solid #e11d48;">
+                                MAIN_ACTOR_UI_BINDING
+                            </span>
+                            <span class="target-name">class: <strong>UserViewModel</strong></span>
+                        </div>
+                        <div class="header-right">
+                            <span class="confidence-badge badge-vh">95% [VERY_HIGH]</span>
+                            <button class="btn-copy-card-ai" onclick='copySingleAiPrompt("Refactor and review the following Swift pattern/violation:\n- Pattern: main_actor_ui_binding (Concurrency & Actors)\n- Target: UserViewModel (class)\n- Location: /Volumes/External/Code/DPX-Swift/examples/clean_ios_architecture/ViewModels/UserViewModel.swift:9:1\n- Summary: Type 'UserViewModel' is bound to @MainActor ensuring all state updates and UI interactions dispatch safely on the main thread\n\nPlease provide an idiomatic Swift 5.5 - 6.0+ clean architecture refactoring adhering to POP, Concurrency, and SOLID principles.")' title="Copy AI Refactoring Prompt">🤖 Copy for AI</button>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <p class="summary-text"><strong>Summary:</strong> Type &#x27;UserViewModel&#x27; is bound to @MainActor ensuring all state updates and UI interactions dispatch safely on the main thread</p>
+                        <p class="primary-loc"><strong>Primary Location:</strong> <code>/Volumes/External/Code/DPX-Swift/examples/clean_ios_architecture/ViewModels/UserViewModel.swift:9:1</code></p>
+                        <div class="evidence-section">
+                            <strong>Evidence Trail (1 heuristics):</strong>
+                            <ul class="evidence-list">
+                                <li class="evidence-item" style="border-left-color: #f43f5e;"><span class="weight-tag" style="color: #fb7185;">+95%</span> <span class="rule-code">[CONCURRENCY_MAIN_ACTOR_BINDING]</span> Type &#x27;UserViewModel&#x27; is bound to @MainActor ensuring all state updates and UI interactions dispatch safely on the main thread <span class="location-tag">📍 /Volumes/External/Code/DPX-Swift/examples/clean_ios_architecture/ViewModels/UserViewModel.swift:9:1</span></li>
+                            </ul>
+                        </div>
+                        
+                    </div>
+                </div>
+                
+                <div class="pattern-card" data-pattern="task_group_concurrency" data-category="concurrency" data-target="batchSyncAll" style="border-left: 4px solid #f43f5e;">
+                    <div class="card-header">
+                        <div class="header-left">
+                            <span class="card-index">#7</span>
+                            <span class="category-badge" style="color: #fb7185; background: #88133744; border: 1px solid #e11d48;">
+                                CONCURRENCY &amp; ACTORS
+                            </span>
+                            <span class="pattern-badge" style="color: #fb7185; background: #88133744; border: 1px solid #e11d48;">
+                                TASK_GROUP_CONCURRENCY
+                            </span>
+                            <span class="target-name">method: <strong>batchSyncAll</strong></span>
+                        </div>
+                        <div class="header-right">
+                            <span class="confidence-badge badge-vh">90% [VERY_HIGH]</span>
+                            <button class="btn-copy-card-ai" onclick='copySingleAiPrompt("Refactor and review the following Swift pattern/violation:\n- Pattern: task_group_concurrency (Concurrency & Actors)\n- Target: batchSyncAll (method)\n- Location: /Volumes/External/Code/DPX-Swift/examples/clean_ios_architecture/Services/NetworkFacade.swift:7:1\n- Summary: Method 'batchSyncAll' utilizes structured concurrency 'withThrowingTaskGroup' for dynamic parallel task fan-out and collection\n\nPlease provide an idiomatic Swift 5.5 - 6.0+ clean architecture refactoring adhering to POP, Concurrency, and SOLID principles.")' title="Copy AI Refactoring Prompt">🤖 Copy for AI</button>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <p class="summary-text"><strong>Summary:</strong> Method &#x27;batchSyncAll&#x27; utilizes structured concurrency &#x27;withThrowingTaskGroup&#x27; for dynamic parallel task fan-out and collection</p>
+                        <p class="primary-loc"><strong>Primary Location:</strong> <code>/Volumes/External/Code/DPX-Swift/examples/clean_ios_architecture/Services/NetworkFacade.swift:7:1</code></p>
+                        <div class="evidence-section">
+                            <strong>Evidence Trail (1 heuristics):</strong>
+                            <ul class="evidence-list">
+                                <li class="evidence-item" style="border-left-color: #f43f5e;"><span class="weight-tag" style="color: #fb7185;">+90%</span> <span class="rule-code">[CONCURRENCY_TASK_GROUP]</span> Method &#x27;batchSyncAll&#x27; utilizes structured concurrency &#x27;withThrowingTaskGroup&#x27; for dynamic parallel task fan-out and collection <span class="location-tag">📍 /Volumes/External/Code/DPX-Swift/examples/clean_ios_architecture/Services/NetworkFacade.swift:7:1</span></li>
+                            </ul>
+                        </div>
+                        
+                    </div>
+                </div>
+                
+                <div class="pattern-card" data-pattern="sendable_thread_safety" data-category="concurrency" data-target="SessionState" style="border-left: 4px solid #f43f5e;">
+                    <div class="card-header">
+                        <div class="header-left">
+                            <span class="card-index">#8</span>
+                            <span class="category-badge" style="color: #fb7185; background: #88133744; border: 1px solid #e11d48;">
+                                CONCURRENCY &amp; ACTORS
+                            </span>
+                            <span class="pattern-badge" style="color: #fb7185; background: #88133744; border: 1px solid #e11d48;">
+                                SENDABLE_THREAD_SAFETY
+                            </span>
+                            <span class="target-name">enum: <strong>SessionState</strong></span>
+                        </div>
+                        <div class="header-right">
+                            <span class="confidence-badge badge-vh">85% [VERY_HIGH]</span>
+                            <button class="btn-copy-card-ai" onclick='copySingleAiPrompt("Refactor and review the following Swift pattern/violation:\n- Pattern: sendable_thread_safety (Concurrency & Actors)\n- Target: SessionState (enum)\n- Location: /Volumes/External/Code/DPX-Swift/examples/clean_ios_architecture/Models/AppState.swift:3:1\n- Summary: Type 'SessionState' conforms to Sendable, establishing thread-safe concurrency boundaries across actors\n\nPlease provide an idiomatic Swift 5.5 - 6.0+ clean architecture refactoring adhering to POP, Concurrency, and SOLID principles.")' title="Copy AI Refactoring Prompt">🤖 Copy for AI</button>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <p class="summary-text"><strong>Summary:</strong> Type &#x27;SessionState&#x27; conforms to Sendable, establishing thread-safe concurrency boundaries across actors</p>
+                        <p class="primary-loc"><strong>Primary Location:</strong> <code>/Volumes/External/Code/DPX-Swift/examples/clean_ios_architecture/Models/AppState.swift:3:1</code></p>
+                        <div class="evidence-section">
+                            <strong>Evidence Trail (1 heuristics):</strong>
+                            <ul class="evidence-list">
+                                <li class="evidence-item" style="border-left-color: #f43f5e;"><span class="weight-tag" style="color: #fb7185;">+85%</span> <span class="rule-code">[CONCURRENCY_SENDABLE_CONFORMANCE]</span> Type &#x27;SessionState&#x27; conforms to Sendable, establishing thread-safe concurrency boundaries across actors <span class="location-tag">📍 /Volumes/External/Code/DPX-Swift/examples/clean_ios_architecture/Models/AppState.swift:3:1</span></li>
+                            </ul>
+                        </div>
+                        
+                    </div>
+                </div>
+                
+                <div class="pattern-card" data-pattern="sendable_thread_safety" data-category="concurrency" data-target="AppStateSnapshot" style="border-left: 4px solid #f43f5e;">
+                    <div class="card-header">
+                        <div class="header-left">
+                            <span class="card-index">#9</span>
+                            <span class="category-badge" style="color: #fb7185; background: #88133744; border: 1px solid #e11d48;">
+                                CONCURRENCY &amp; ACTORS
+                            </span>
+                            <span class="pattern-badge" style="color: #fb7185; background: #88133744; border: 1px solid #e11d48;">
+                                SENDABLE_THREAD_SAFETY
+                            </span>
+                            <span class="target-name">struct: <strong>AppStateSnapshot</strong></span>
+                        </div>
+                        <div class="header-right">
+                            <span class="confidence-badge badge-vh">85% [VERY_HIGH]</span>
+                            <button class="btn-copy-card-ai" onclick='copySingleAiPrompt("Refactor and review the following Swift pattern/violation:\n- Pattern: sendable_thread_safety (Concurrency & Actors)\n- Target: AppStateSnapshot (struct)\n- Location: /Volumes/External/Code/DPX-Swift/examples/clean_ios_architecture/Models/AppState.swift:10:1\n- Summary: Type 'AppStateSnapshot' conforms to Sendable, establishing thread-safe concurrency boundaries across actors\n\nPlease provide an idiomatic Swift 5.5 - 6.0+ clean architecture refactoring adhering to POP, Concurrency, and SOLID principles.")' title="Copy AI Refactoring Prompt">🤖 Copy for AI</button>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <p class="summary-text"><strong>Summary:</strong> Type &#x27;AppStateSnapshot&#x27; conforms to Sendable, establishing thread-safe concurrency boundaries across actors</p>
+                        <p class="primary-loc"><strong>Primary Location:</strong> <code>/Volumes/External/Code/DPX-Swift/examples/clean_ios_architecture/Models/AppState.swift:10:1</code></p>
+                        <div class="evidence-section">
+                            <strong>Evidence Trail (1 heuristics):</strong>
+                            <ul class="evidence-list">
+                                <li class="evidence-item" style="border-left-color: #f43f5e;"><span class="weight-tag" style="color: #fb7185;">+85%</span> <span class="rule-code">[CONCURRENCY_SENDABLE_CONFORMANCE]</span> Type &#x27;AppStateSnapshot&#x27; conforms to Sendable, establishing thread-safe concurrency boundaries across actors <span class="location-tag">📍 /Volumes/External/Code/DPX-Swift/examples/clean_ios_architecture/Models/AppState.swift:10:1</span></li>
+                            </ul>
+                        </div>
+                        
+                    </div>
+                </div>
+                
+                <div class="pattern-card" data-pattern="sendable_thread_safety" data-category="concurrency" data-target="EntityProtocol" style="border-left: 4px solid #f43f5e;">
+                    <div class="card-header">
+                        <div class="header-left">
+                            <span class="card-index">#10</span>
+                            <span class="category-badge" style="color: #fb7185; background: #88133744; border: 1px solid #e11d48;">
+                                CONCURRENCY &amp; ACTORS
+                            </span>
+                            <span class="pattern-badge" style="color: #fb7185; background: #88133744; border: 1px solid #e11d48;">
+                                SENDABLE_THREAD_SAFETY
+                            </span>
+                            <span class="target-name">protocol: <strong>EntityProtocol</strong></span>
+                        </div>
+                        <div class="header-right">
+                            <span class="confidence-badge badge-vh">85% [VERY_HIGH]</span>
+                            <button class="btn-copy-card-ai" onclick='copySingleAiPrompt("Refactor and review the following Swift pattern/violation:\n- Pattern: sendable_thread_safety (Concurrency & Actors)\n- Target: EntityProtocol (protocol)\n- Location: /Volumes/External/Code/DPX-Swift/examples/clean_ios_architecture/Protocols/RepositoryProtocol.swift:3:1\n- Summary: Type 'EntityProtocol' conforms to Sendable, establishing thread-safe concurrency boundaries across actors\n\nPlease provide an idiomatic Swift 5.5 - 6.0+ clean architecture refactoring adhering to POP, Concurrency, and SOLID principles.")' title="Copy AI Refactoring Prompt">🤖 Copy for AI</button>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <p class="summary-text"><strong>Summary:</strong> Type &#x27;EntityProtocol&#x27; conforms to Sendable, establishing thread-safe concurrency boundaries across actors</p>
+                        <p class="primary-loc"><strong>Primary Location:</strong> <code>/Volumes/External/Code/DPX-Swift/examples/clean_ios_architecture/Protocols/RepositoryProtocol.swift:3:1</code></p>
+                        <div class="evidence-section">
+                            <strong>Evidence Trail (1 heuristics):</strong>
+                            <ul class="evidence-list">
+                                <li class="evidence-item" style="border-left-color: #f43f5e;"><span class="weight-tag" style="color: #fb7185;">+85%</span> <span class="rule-code">[CONCURRENCY_SENDABLE_CONFORMANCE]</span> Type &#x27;EntityProtocol&#x27; conforms to Sendable, establishing thread-safe concurrency boundaries across actors <span class="location-tag">📍 /Volumes/External/Code/DPX-Swift/examples/clean_ios_architecture/Protocols/RepositoryProtocol.swift:3:1</span></li>
+                            </ul>
+                        </div>
+                        
+                    </div>
+                </div>
+                
+                <div class="pattern-card" data-pattern="sendable_thread_safety" data-category="concurrency" data-target="UserAccount" style="border-left: 4px solid #f43f5e;">
+                    <div class="card-header">
+                        <div class="header-left">
+                            <span class="card-index">#11</span>
+                            <span class="category-badge" style="color: #fb7185; background: #88133744; border: 1px solid #e11d48;">
+                                CONCURRENCY &amp; ACTORS
+                            </span>
+                            <span class="pattern-badge" style="color: #fb7185; background: #88133744; border: 1px solid #e11d48;">
+                                SENDABLE_THREAD_SAFETY
+                            </span>
+                            <span class="target-name">struct: <strong>UserAccount</strong></span>
+                        </div>
+                        <div class="header-right">
+                            <span class="confidence-badge badge-vh">85% [VERY_HIGH]</span>
+                            <button class="btn-copy-card-ai" onclick='copySingleAiPrompt("Refactor and review the following Swift pattern/violation:\n- Pattern: sendable_thread_safety (Concurrency & Actors)\n- Target: UserAccount (struct)\n- Location: /Volumes/External/Code/DPX-Swift/examples/clean_ios_architecture/Services/AccountDataStore.swift:3:1\n- Summary: Type 'UserAccount' conforms to Sendable, establishing thread-safe concurrency boundaries across actors\n\nPlease provide an idiomatic Swift 5.5 - 6.0+ clean architecture refactoring adhering to POP, Concurrency, and SOLID principles.")' title="Copy AI Refactoring Prompt">🤖 Copy for AI</button>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <p class="summary-text"><strong>Summary:</strong> Type &#x27;UserAccount&#x27; conforms to Sendable, establishing thread-safe concurrency boundaries across actors</p>
+                        <p class="primary-loc"><strong>Primary Location:</strong> <code>/Volumes/External/Code/DPX-Swift/examples/clean_ios_architecture/Services/AccountDataStore.swift:3:1</code></p>
+                        <div class="evidence-section">
+                            <strong>Evidence Trail (1 heuristics):</strong>
+                            <ul class="evidence-list">
+                                <li class="evidence-item" style="border-left-color: #f43f5e;"><span class="weight-tag" style="color: #fb7185;">+85%</span> <span class="rule-code">[CONCURRENCY_SENDABLE_CONFORMANCE]</span> Type &#x27;UserAccount&#x27; conforms to Sendable, establishing thread-safe concurrency boundaries across actors <span class="location-tag">📍 /Volumes/External/Code/DPX-Swift/examples/clean_ios_architecture/Services/AccountDataStore.swift:3:1</span></li>
+                            </ul>
+                        </div>
+                        
+                    </div>
+                </div>
+                
+                <div class="pattern-card" data-pattern="view_modifier_pipeline" data-category="declarative_dsl" data-target="PrimaryCardModifier" style="border-left: 4px solid #a855f7;">
+                    <div class="card-header">
+                        <div class="header-left">
+                            <span class="card-index">#12</span>
+                            <span class="category-badge" style="color: #c084fc; background: #581c8744; border: 1px solid #9333ea;">
+                                SWIFTUI &amp; DSL
+                            </span>
+                            <span class="pattern-badge" style="color: #c084fc; background: #581c8744; border: 1px solid #9333ea;">
+                                VIEW_MODIFIER_PIPELINE
+                            </span>
+                            <span class="target-name">struct: <strong>PrimaryCardModifier</strong></span>
+                        </div>
+                        <div class="header-right">
+                            <span class="confidence-badge badge-vh">95% [VERY_HIGH]</span>
+                            <button class="btn-copy-card-ai" onclick='copySingleAiPrompt("Refactor and review the following Swift pattern/violation:\n- Pattern: view_modifier_pipeline (SwiftUI & DSL)\n- Target: PrimaryCardModifier (struct)\n- Location: /Volumes/External/Code/DPX-Swift/examples/clean_ios_architecture/Views/ProfileView.swift:3:1\n- Summary: Struct 'PrimaryCardModifier' conforms to ViewModifier providing reusable composable view transformation pipeline\n\nPlease provide an idiomatic Swift 5.5 - 6.0+ clean architecture refactoring adhering to POP, Concurrency, and SOLID principles.")' title="Copy AI Refactoring Prompt">🤖 Copy for AI</button>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <p class="summary-text"><strong>Summary:</strong> Struct &#x27;PrimaryCardModifier&#x27; conforms to ViewModifier providing reusable composable view transformation pipeline</p>
+                        <p class="primary-loc"><strong>Primary Location:</strong> <code>/Volumes/External/Code/DPX-Swift/examples/clean_ios_architecture/Views/ProfileView.swift:3:1</code></p>
+                        <div class="evidence-section">
+                            <strong>Evidence Trail (1 heuristics):</strong>
+                            <ul class="evidence-list">
+                                <li class="evidence-item" style="border-left-color: #a855f7;"><span class="weight-tag" style="color: #c084fc;">+95%</span> <span class="rule-code">[DSL_VIEW_MODIFIER_CONFORMANCE]</span> Struct &#x27;PrimaryCardModifier&#x27; conforms to ViewModifier providing reusable composable view transformation pipeline <span class="location-tag">📍 /Volumes/External/Code/DPX-Swift/examples/clean_ios_architecture/Views/ProfileView.swift:3:1</span></li>
+                            </ul>
+                        </div>
+                        
+                    </div>
+                </div>
+                
+                <div class="pattern-card" data-pattern="singleton_shared_instance" data-category="creational" data-target="NetworkFacadeService" style="border-left: 4px solid #10b981;">
+                    <div class="card-header">
+                        <div class="header-left">
+                            <span class="card-index">#13</span>
+                            <span class="category-badge" style="color: #34d399; background: #064e3b44; border: 1px solid #059669;">
+                                CREATIONAL
+                            </span>
+                            <span class="pattern-badge" style="color: #34d399; background: #064e3b44; border: 1px solid #059669;">
+                                SINGLETON_SHARED_INSTANCE
+                            </span>
+                            <span class="target-name">class: <strong>NetworkFacadeService</strong></span>
+                        </div>
+                        <div class="header-right">
+                            <span class="confidence-badge badge-vh">95% [VERY_HIGH]</span>
+                            <button class="btn-copy-card-ai" onclick='copySingleAiPrompt("Refactor and review the following Swift pattern/violation:\n- Pattern: singleton_shared_instance (Creational)\n- Target: NetworkFacadeService (class)\n- Location: /Volumes/External/Code/DPX-Swift/examples/clean_ios_architecture/Services/NetworkFacade.swift:3:1\n- Summary: Type 'NetworkFacadeService' defines thread-safe static shared singleton instance with private initialization\n\nPlease provide an idiomatic Swift 5.5 - 6.0+ clean architecture refactoring adhering to POP, Concurrency, and SOLID principles.")' title="Copy AI Refactoring Prompt">🤖 Copy for AI</button>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <p class="summary-text"><strong>Summary:</strong> Type &#x27;NetworkFacadeService&#x27; defines thread-safe static shared singleton instance with private initialization</p>
+                        <p class="primary-loc"><strong>Primary Location:</strong> <code>/Volumes/External/Code/DPX-Swift/examples/clean_ios_architecture/Services/NetworkFacade.swift:3:1</code></p>
+                        <div class="evidence-section">
+                            <strong>Evidence Trail (1 heuristics):</strong>
+                            <ul class="evidence-list">
+                                <li class="evidence-item" style="border-left-color: #10b981;"><span class="weight-tag" style="color: #34d399;">+95%</span> <span class="rule-code">[CREATIONAL_SINGLETON_SHARED_INSTANCE]</span> Type &#x27;NetworkFacadeService&#x27; defines thread-safe static shared singleton instance with private initialization <span class="location-tag">📍 /Volumes/External/Code/DPX-Swift/examples/clean_ios_architecture/Services/NetworkFacade.swift:3:1</span></li>
+                            </ul>
+                        </div>
+                        
+                    </div>
+                </div>
+                
+                <div class="pattern-card" data-pattern="composite_view_hierarchy" data-category="structural" data-target="ProfileContainerView" style="border-left: 4px solid #06b6d4;">
+                    <div class="card-header">
+                        <div class="header-left">
+                            <span class="card-index">#14</span>
+                            <span class="category-badge" style="color: #67e8f9; background: #164e6344; border: 1px solid #0891b2;">
+                                STRUCTURAL
+                            </span>
+                            <span class="pattern-badge" style="color: #67e8f9; background: #164e6344; border: 1px solid #0891b2;">
+                                COMPOSITE_VIEW_HIERARCHY
+                            </span>
+                            <span class="target-name">struct: <strong>ProfileContainerView</strong></span>
+                        </div>
+                        <div class="header-right">
+                            <span class="confidence-badge badge-vh">85% [VERY_HIGH]</span>
+                            <button class="btn-copy-card-ai" onclick='copySingleAiPrompt("Refactor and review the following Swift pattern/violation:\n- Pattern: composite_view_hierarchy (Structural)\n- Target: ProfileContainerView (struct)\n- Location: /Volumes/External/Code/DPX-Swift/examples/clean_ios_architecture/Views/ProfileView.swift:12:1\n- Summary: SwiftUI View 'ProfileContainerView' implements Composite pattern hosting nested child view hierarchy via @ViewBuilder\n\nPlease provide an idiomatic Swift 5.5 - 6.0+ clean architecture refactoring adhering to POP, Concurrency, and SOLID principles.")' title="Copy AI Refactoring Prompt">🤖 Copy for AI</button>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <p class="summary-text"><strong>Summary:</strong> SwiftUI View &#x27;ProfileContainerView&#x27; implements Composite pattern hosting nested child view hierarchy via @ViewBuilder</p>
+                        <p class="primary-loc"><strong>Primary Location:</strong> <code>/Volumes/External/Code/DPX-Swift/examples/clean_ios_architecture/Views/ProfileView.swift:12:1</code></p>
+                        <div class="evidence-section">
+                            <strong>Evidence Trail (1 heuristics):</strong>
+                            <ul class="evidence-list">
+                                <li class="evidence-item" style="border-left-color: #06b6d4;"><span class="weight-tag" style="color: #67e8f9;">+85%</span> <span class="rule-code">[STRUCTURAL_COMPOSITE_VIEW]</span> SwiftUI View &#x27;ProfileContainerView&#x27; implements Composite pattern hosting nested child view hierarchy via @ViewBuilder <span class="location-tag">📍 /Volumes/External/Code/DPX-Swift/examples/clean_ios_architecture/Views/ProfileView.swift:12:1</span></li>
+                            </ul>
+                        </div>
+                        
+                    </div>
+                </div>
+                
+                <div class="pattern-card" data-pattern="facade_service" data-category="structural" data-target="NetworkFacadeService" style="border-left: 4px solid #06b6d4;">
+                    <div class="card-header">
+                        <div class="header-left">
+                            <span class="card-index">#15</span>
+                            <span class="category-badge" style="color: #67e8f9; background: #164e6344; border: 1px solid #0891b2;">
+                                STRUCTURAL
+                            </span>
+                            <span class="pattern-badge" style="color: #67e8f9; background: #164e6344; border: 1px solid #0891b2;">
+                                FACADE_SERVICE
+                            </span>
+                            <span class="target-name">class: <strong>NetworkFacadeService</strong></span>
+                        </div>
+                        <div class="header-right">
+                            <span class="confidence-badge badge-vh">90% [VERY_HIGH]</span>
+                            <button class="btn-copy-card-ai" onclick='copySingleAiPrompt("Refactor and review the following Swift pattern/violation:\n- Pattern: facade_service (Structural)\n- Target: NetworkFacadeService (class)\n- Location: /Volumes/External/Code/DPX-Swift/examples/clean_ios_architecture/Services/NetworkFacade.swift:3:1\n- Summary: Type 'NetworkFacadeService' coordinates 0 subsystem dependencies as a unified Facade\n\nPlease provide an idiomatic Swift 5.5 - 6.0+ clean architecture refactoring adhering to POP, Concurrency, and SOLID principles.")' title="Copy AI Refactoring Prompt">🤖 Copy for AI</button>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <p class="summary-text"><strong>Summary:</strong> Type &#x27;NetworkFacadeService&#x27; coordinates 0 subsystem dependencies as a unified Facade</p>
+                        <p class="primary-loc"><strong>Primary Location:</strong> <code>/Volumes/External/Code/DPX-Swift/examples/clean_ios_architecture/Services/NetworkFacade.swift:3:1</code></p>
+                        <div class="evidence-section">
+                            <strong>Evidence Trail (1 heuristics):</strong>
+                            <ul class="evidence-list">
+                                <li class="evidence-item" style="border-left-color: #06b6d4;"><span class="weight-tag" style="color: #67e8f9;">+90%</span> <span class="rule-code">[STRUCTURAL_FACADE_SERVICE]</span> Type &#x27;NetworkFacadeService&#x27; coordinates 0 subsystem dependencies as a unified Facade <span class="location-tag">📍 /Volumes/External/Code/DPX-Swift/examples/clean_ios_architecture/Services/NetworkFacade.swift:3:1</span></li>
+                            </ul>
+                        </div>
+                        
+                    </div>
+                </div>
+                
+                <div class="pattern-card" data-pattern="delegate_pattern_weak" data-category="behavioral" data-target="UserViewModel.delegate" style="border-left: 4px solid #f59e0b;">
+                    <div class="card-header">
+                        <div class="header-left">
+                            <span class="card-index">#16</span>
+                            <span class="category-badge" style="color: #fbbf24; background: #78350f44; border: 1px solid #d97706;">
+                                BEHAVIORAL
+                            </span>
+                            <span class="pattern-badge" style="color: #fbbf24; background: #78350f44; border: 1px solid #d97706;">
+                                DELEGATE_PATTERN_WEAK
+                            </span>
+                            <span class="target-name">property: <strong>UserViewModel.delegate</strong></span>
+                        </div>
+                        <div class="header-right">
+                            <span class="confidence-badge badge-vh">90% [VERY_HIGH]</span>
+                            <button class="btn-copy-card-ai" onclick='copySingleAiPrompt("Refactor and review the following Swift pattern/violation:\n- Pattern: delegate_pattern_weak (Behavioral)\n- Target: UserViewModel.delegate (property)\n- Location: /Volumes/External/Code/DPX-Swift/examples/clean_ios_architecture/ViewModels/UserViewModel.swift:13:1\n- Summary: Property 'UserViewModel.delegate' implements safe Weak Delegate pattern avoiding retain cycles\n\nPlease provide an idiomatic Swift 5.5 - 6.0+ clean architecture refactoring adhering to POP, Concurrency, and SOLID principles.")' title="Copy AI Refactoring Prompt">🤖 Copy for AI</button>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <p class="summary-text"><strong>Summary:</strong> Property &#x27;UserViewModel.delegate&#x27; implements safe Weak Delegate pattern avoiding retain cycles</p>
+                        <p class="primary-loc"><strong>Primary Location:</strong> <code>/Volumes/External/Code/DPX-Swift/examples/clean_ios_architecture/ViewModels/UserViewModel.swift:13:1</code></p>
+                        <div class="evidence-section">
+                            <strong>Evidence Trail (1 heuristics):</strong>
+                            <ul class="evidence-list">
+                                <li class="evidence-item" style="border-left-color: #f59e0b;"><span class="weight-tag" style="color: #fbbf24;">+90%</span> <span class="rule-code">[BEHAVIORAL_DELEGATE_PATTERN_WEAK]</span> Property &#x27;UserViewModel.delegate&#x27; implements safe Weak Delegate pattern avoiding retain cycles <span class="location-tag">📍 /Volumes/External/Code/DPX-Swift/examples/clean_ios_architecture/ViewModels/UserViewModel.swift:13:1</span></li>
+                            </ul>
+                        </div>
+                        
+                    </div>
+                </div>
+                
+                <div class="pattern-card" data-pattern="observer_combine_published" data-category="behavioral" data-target="UserViewModel" style="border-left: 4px solid #f59e0b;">
+                    <div class="card-header">
+                        <div class="header-left">
+                            <span class="card-index">#17</span>
+                            <span class="category-badge" style="color: #fbbf24; background: #78350f44; border: 1px solid #d97706;">
+                                BEHAVIORAL
+                            </span>
+                            <span class="pattern-badge" style="color: #fbbf24; background: #78350f44; border: 1px solid #d97706;">
+                                OBSERVER_COMBINE_PUBLISHED
+                            </span>
+                            <span class="target-name">class: <strong>UserViewModel</strong></span>
+                        </div>
+                        <div class="header-right">
+                            <span class="confidence-badge badge-vh">95% [VERY_HIGH]</span>
+                            <button class="btn-copy-card-ai" onclick='copySingleAiPrompt("Refactor and review the following Swift pattern/violation:\n- Pattern: observer_combine_published (Behavioral)\n- Target: UserViewModel (class)\n- Location: /Volumes/External/Code/DPX-Swift/examples/clean_ios_architecture/ViewModels/UserViewModel.swift:9:1\n- Summary: Type 'UserViewModel' acts as Reactive Observer Subject with 2 @Published / Subject property(ies)\n\nPlease provide an idiomatic Swift 5.5 - 6.0+ clean architecture refactoring adhering to POP, Concurrency, and SOLID principles.")' title="Copy AI Refactoring Prompt">🤖 Copy for AI</button>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <p class="summary-text"><strong>Summary:</strong> Type &#x27;UserViewModel&#x27; acts as Reactive Observer Subject with 2 @Published / Subject property(ies)</p>
+                        <p class="primary-loc"><strong>Primary Location:</strong> <code>/Volumes/External/Code/DPX-Swift/examples/clean_ios_architecture/ViewModels/UserViewModel.swift:9:1</code></p>
+                        <div class="evidence-section">
+                            <strong>Evidence Trail (1 heuristics):</strong>
+                            <ul class="evidence-list">
+                                <li class="evidence-item" style="border-left-color: #f59e0b;"><span class="weight-tag" style="color: #fbbf24;">+95%</span> <span class="rule-code">[BEHAVIORAL_OBSERVER_COMBINE]</span> Type &#x27;UserViewModel&#x27; acts as Reactive Observer Subject with 2 @Published / Subject property(ies) <span class="location-tag">📍 /Volumes/External/Code/DPX-Swift/examples/clean_ios_architecture/ViewModels/UserViewModel.swift:9:1</span></li>
+                            </ul>
+                        </div>
+                        
+                    </div>
+                </div>
+                
+                <div class="pattern-card" data-pattern="state_enum_associated_values" data-category="behavioral" data-target="SessionState" style="border-left: 4px solid #f59e0b;">
+                    <div class="card-header">
+                        <div class="header-left">
+                            <span class="card-index">#18</span>
+                            <span class="category-badge" style="color: #fbbf24; background: #78350f44; border: 1px solid #d97706;">
+                                BEHAVIORAL
+                            </span>
+                            <span class="pattern-badge" style="color: #fbbf24; background: #78350f44; border: 1px solid #d97706;">
+                                STATE_ENUM_ASSOCIATED_VALUES
+                            </span>
+                            <span class="target-name">enum: <strong>SessionState</strong></span>
+                        </div>
+                        <div class="header-right">
+                            <span class="confidence-badge badge-h">80% [HIGH]</span>
+                            <button class="btn-copy-card-ai" onclick='copySingleAiPrompt("Refactor and review the following Swift pattern/violation:\n- Pattern: state_enum_associated_values (Behavioral)\n- Target: SessionState (enum)\n- Location: /Volumes/External/Code/DPX-Swift/examples/clean_ios_architecture/Models/AppState.swift:3:1\n- Summary: Enum 'SessionState' models type-safe State Machine with associated lifecycle states\n\nPlease provide an idiomatic Swift 5.5 - 6.0+ clean architecture refactoring adhering to POP, Concurrency, and SOLID principles.")' title="Copy AI Refactoring Prompt">🤖 Copy for AI</button>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <p class="summary-text"><strong>Summary:</strong> Enum &#x27;SessionState&#x27; models type-safe State Machine with associated lifecycle states</p>
+                        <p class="primary-loc"><strong>Primary Location:</strong> <code>/Volumes/External/Code/DPX-Swift/examples/clean_ios_architecture/Models/AppState.swift:3:1</code></p>
+                        <div class="evidence-section">
+                            <strong>Evidence Trail (1 heuristics):</strong>
+                            <ul class="evidence-list">
+                                <li class="evidence-item" style="border-left-color: #f59e0b;"><span class="weight-tag" style="color: #fbbf24;">+80%</span> <span class="rule-code">[BEHAVIORAL_STATE_ENUM]</span> Enum &#x27;SessionState&#x27; models type-safe State Machine with associated lifecycle states <span class="location-tag">📍 /Volumes/External/Code/DPX-Swift/examples/clean_ios_architecture/Models/AppState.swift:3:1</span></li>
+                            </ul>
+                        </div>
+                        
+                    </div>
+                </div>
+                
+                <div class="pattern-card" data-pattern="memento_codable_snapshot" data-category="behavioral" data-target="AppStateSnapshot" style="border-left: 4px solid #f59e0b;">
+                    <div class="card-header">
+                        <div class="header-left">
+                            <span class="card-index">#19</span>
+                            <span class="category-badge" style="color: #fbbf24; background: #78350f44; border: 1px solid #d97706;">
+                                BEHAVIORAL
+                            </span>
+                            <span class="pattern-badge" style="color: #fbbf24; background: #78350f44; border: 1px solid #d97706;">
+                                MEMENTO_CODABLE_SNAPSHOT
+                            </span>
+                            <span class="target-name">struct: <strong>AppStateSnapshot</strong></span>
+                        </div>
+                        <div class="header-right">
+                            <span class="confidence-badge badge-vh">85% [VERY_HIGH]</span>
+                            <button class="btn-copy-card-ai" onclick='copySingleAiPrompt("Refactor and review the following Swift pattern/violation:\n- Pattern: memento_codable_snapshot (Behavioral)\n- Target: AppStateSnapshot (struct)\n- Location: /Volumes/External/Code/DPX-Swift/examples/clean_ios_architecture/Models/AppState.swift:10:1\n- Summary: Type 'AppStateSnapshot' captures and externalizes object state as a Memento Snapshot\n\nPlease provide an idiomatic Swift 5.5 - 6.0+ clean architecture refactoring adhering to POP, Concurrency, and SOLID principles.")' title="Copy AI Refactoring Prompt">🤖 Copy for AI</button>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <p class="summary-text"><strong>Summary:</strong> Type &#x27;AppStateSnapshot&#x27; captures and externalizes object state as a Memento Snapshot</p>
+                        <p class="primary-loc"><strong>Primary Location:</strong> <code>/Volumes/External/Code/DPX-Swift/examples/clean_ios_architecture/Models/AppState.swift:10:1</code></p>
+                        <div class="evidence-section">
+                            <strong>Evidence Trail (1 heuristics):</strong>
+                            <ul class="evidence-list">
+                                <li class="evidence-item" style="border-left-color: #f59e0b;"><span class="weight-tag" style="color: #fbbf24;">+85%</span> <span class="rule-code">[BEHAVIORAL_MEMENTO_SNAPSHOT]</span> Type &#x27;AppStateSnapshot&#x27; captures and externalizes object state as a Memento Snapshot <span class="location-tag">📍 /Volumes/External/Code/DPX-Swift/examples/clean_ios_architecture/Models/AppState.swift:10:1</span></li>
+                            </ul>
+                        </div>
+                        
+                    </div>
+                </div>
+                
+        </div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div id="toast" class="toast">
+        <span>✅</span>
+        <span id="toastMsg">AI Context Prompt Copied to Clipboard!</span>
+    </div>
+
+    <!-- AI Prompt Preview Modal -->
+    <div id="promptModal" class="modal-overlay" onclick="closeModalOnOverlay(event)">
+        <div class="modal-box">
+            <div class="modal-header">
+                <div class="modal-title">🤖 AI Architect Context Prompt (Swift)</div>
+                <button class="modal-close" onclick="closePromptModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <p style="font-size: 13px; color: #94a3b8; margin-bottom: 12px;">Structured XML/Markdown context for LLMs (Claude, GPT-4, Gemini) including POP extensions, actor concurrency, and memory safety analysis.</p>
+                <textarea id="modalPromptArea" class="prompt-textarea" readonly>&lt;codebase_architecture_analysis language=&quot;swift&quot;&gt;
+  &lt;project path=&quot;/Volumes/External/Code/DPX-Swift/examples/clean_ios_architecture&quot; files=&quot;6&quot; detections=&quot;19&quot;&gt;
+    &lt;category_summary&gt;
+      &lt;category name=&quot;PROTOCOL_ORIENTED&quot; count=&quot;4&quot; /&gt;
+      &lt;category name=&quot;CONCURRENCY&quot; count=&quot;7&quot; /&gt;
+      &lt;category name=&quot;DECLARATIVE_DSL&quot; count=&quot;1&quot; /&gt;
+      &lt;category name=&quot;CREATIONAL&quot; count=&quot;1&quot; /&gt;
+      &lt;category name=&quot;STRUCTURAL&quot; count=&quot;2&quot; /&gt;
+      &lt;category name=&quot;BEHAVIORAL&quot; count=&quot;4&quot; /&gt;
+    &lt;/category_summary&gt;
+    &lt;swift_design_patterns_and_concurrency&gt;
+      &lt;pattern type=&quot;protocol_extension_default_impl&quot; target=&quot;RepositoryProtocol&quot; category=&quot;protocol_oriented&quot; confidence=&quot;90%&quot; location=&quot;/Volumes/External/Code/DPX-Swift/examples/clean_ios_architecture/Protocols/RepositoryProtocol.swift:16&quot;&gt;
+        &lt;summary&gt;Extension on protocol &#x27;RepositoryProtocol&#x27; provides default implementation for 1 method(s): all&lt;/summary&gt;
+        &lt;evidence&gt;
+          &lt;item rule=&quot;POP_PROTOCOL_EXTENSION_DEFAULT_IMPL&quot; weight=&quot;+90%&quot;&gt;Extension on protocol &#x27;RepositoryProtocol&#x27; provides default implementation for 1 method(s): all&lt;/item&gt;
+        &lt;/evidence&gt;
+      &lt;/pattern&gt;
+      &lt;pattern type=&quot;associated_type_pat&quot; target=&quot;EntityProtocol&quot; category=&quot;protocol_oriented&quot; confidence=&quot;90%&quot; location=&quot;/Volumes/External/Code/DPX-Swift/examples/clean_ios_architecture/Protocols/RepositoryProtocol.swift:3&quot;&gt;
+        &lt;summary&gt;Protocol &#x27;EntityProtocol&#x27; defines associated type(s) (ID), enabling generic protocol abstraction&lt;/summary&gt;
+        &lt;evidence&gt;
+          &lt;item rule=&quot;POP_ASSOCIATED_TYPE_PAT&quot; weight=&quot;+90%&quot;&gt;Protocol &#x27;EntityProtocol&#x27; defines associated type(s) (ID), enabling generic protocol abstraction&lt;/item&gt;
+        &lt;/evidence&gt;
+      &lt;/pattern&gt;
+      &lt;pattern type=&quot;associated_type_pat&quot; target=&quot;RepositoryProtocol&quot; category=&quot;protocol_oriented&quot; confidence=&quot;90%&quot; location=&quot;/Volumes/External/Code/DPX-Swift/examples/clean_ios_architecture/Protocols/RepositoryProtocol.swift:8&quot;&gt;
+        &lt;summary&gt;Protocol &#x27;RepositoryProtocol&#x27; defines associated type(s) (Entity), enabling generic protocol abstraction&lt;/summary&gt;
+        &lt;evidence&gt;
+          &lt;item rule=&quot;POP_ASSOCIATED_TYPE_PAT&quot; weight=&quot;+90%&quot;&gt;Protocol &#x27;RepositoryProtocol&#x27; defines associated type(s) (Entity), enabling generic protocol abstraction&lt;/item&gt;
+        &lt;/evidence&gt;
+      &lt;/pattern&gt;
+      &lt;pattern type=&quot;opaque_return_type&quot; target=&quot;body&quot; category=&quot;protocol_oriented&quot; confidence=&quot;85%&quot; location=&quot;/Volumes/External/Code/DPX-Swift/examples/clean_ios_architecture/Views/ProfileView.swift:4&quot;&gt;
+        &lt;summary&gt;Method &#x27;body&#x27; returns opaque type &#x27;some View&#x27;, hiding concrete type implementation while preserving type identity&lt;/summary&gt;
+        &lt;evidence&gt;
+          &lt;item rule=&quot;POP_OPAQUE_RETURN_TYPE&quot; weight=&quot;+85%&quot;&gt;Method &#x27;body&#x27; returns opaque type &#x27;some View&#x27;, hiding concrete type implementation while preserving type identity&lt;/item&gt;
+        &lt;/evidence&gt;
+      &lt;/pattern&gt;
+      &lt;pattern type=&quot;actor_model_isolation&quot; target=&quot;AccountDataStore&quot; category=&quot;concurrency&quot; confidence=&quot;95%&quot; location=&quot;/Volumes/External/Code/DPX-Swift/examples/clean_ios_architecture/Services/AccountDataStore.swift:9&quot;&gt;
+        &lt;summary&gt;Actor &#x27;AccountDataStore&#x27; guarantees data isolation and thread safety via the Swift Actor model&lt;/summary&gt;
+        &lt;evidence&gt;
+          &lt;item rule=&quot;CONCURRENCY_ACTOR_ISOLATION&quot; weight=&quot;+95%&quot;&gt;Actor &#x27;AccountDataStore&#x27; guarantees data isolation and thread safety via the Swift Actor model&lt;/item&gt;
+        &lt;/evidence&gt;
+      &lt;/pattern&gt;
+      &lt;pattern type=&quot;main_actor_ui_binding&quot; target=&quot;UserViewModel&quot; category=&quot;concurrency&quot; confidence=&quot;95%&quot; location=&quot;/Volumes/External/Code/DPX-Swift/examples/clean_ios_architecture/ViewModels/UserViewModel.swift:9&quot;&gt;
+        &lt;summary&gt;Type &#x27;UserViewModel&#x27; is bound to @MainActor ensuring all state updates and UI interactions dispatch safely on the main thread&lt;/summary&gt;
+        &lt;evidence&gt;
+          &lt;item rule=&quot;CONCURRENCY_MAIN_ACTOR_BINDING&quot; weight=&quot;+95%&quot;&gt;Type &#x27;UserViewModel&#x27; is bound to @MainActor ensuring all state updates and UI interactions dispatch safely on the main thread&lt;/item&gt;
+        &lt;/evidence&gt;
+      &lt;/pattern&gt;
+      &lt;pattern type=&quot;task_group_concurrency&quot; target=&quot;batchSyncAll&quot; category=&quot;concurrency&quot; confidence=&quot;90%&quot; location=&quot;/Volumes/External/Code/DPX-Swift/examples/clean_ios_architecture/Services/NetworkFacade.swift:7&quot;&gt;
+        &lt;summary&gt;Method &#x27;batchSyncAll&#x27; utilizes structured concurrency &#x27;withThrowingTaskGroup&#x27; for dynamic parallel task fan-out and collection&lt;/summary&gt;
+        &lt;evidence&gt;
+          &lt;item rule=&quot;CONCURRENCY_TASK_GROUP&quot; weight=&quot;+90%&quot;&gt;Method &#x27;batchSyncAll&#x27; utilizes structured concurrency &#x27;withThrowingTaskGroup&#x27; for dynamic parallel task fan-out and collection&lt;/item&gt;
+        &lt;/evidence&gt;
+      &lt;/pattern&gt;
+      &lt;pattern type=&quot;sendable_thread_safety&quot; target=&quot;SessionState&quot; category=&quot;concurrency&quot; confidence=&quot;85%&quot; location=&quot;/Volumes/External/Code/DPX-Swift/examples/clean_ios_architecture/Models/AppState.swift:3&quot;&gt;
+        &lt;summary&gt;Type &#x27;SessionState&#x27; conforms to Sendable, establishing thread-safe concurrency boundaries across actors&lt;/summary&gt;
+        &lt;evidence&gt;
+          &lt;item rule=&quot;CONCURRENCY_SENDABLE_CONFORMANCE&quot; weight=&quot;+85%&quot;&gt;Type &#x27;SessionState&#x27; conforms to Sendable, establishing thread-safe concurrency boundaries across actors&lt;/item&gt;
+        &lt;/evidence&gt;
+      &lt;/pattern&gt;
+      &lt;pattern type=&quot;sendable_thread_safety&quot; target=&quot;AppStateSnapshot&quot; category=&quot;concurrency&quot; confidence=&quot;85%&quot; location=&quot;/Volumes/External/Code/DPX-Swift/examples/clean_ios_architecture/Models/AppState.swift:10&quot;&gt;
+        &lt;summary&gt;Type &#x27;AppStateSnapshot&#x27; conforms to Sendable, establishing thread-safe concurrency boundaries across actors&lt;/summary&gt;
+        &lt;evidence&gt;
+          &lt;item rule=&quot;CONCURRENCY_SENDABLE_CONFORMANCE&quot; weight=&quot;+85%&quot;&gt;Type &#x27;AppStateSnapshot&#x27; conforms to Sendable, establishing thread-safe concurrency boundaries across actors&lt;/item&gt;
+        &lt;/evidence&gt;
+      &lt;/pattern&gt;
+      &lt;pattern type=&quot;sendable_thread_safety&quot; target=&quot;EntityProtocol&quot; category=&quot;concurrency&quot; confidence=&quot;85%&quot; location=&quot;/Volumes/External/Code/DPX-Swift/examples/clean_ios_architecture/Protocols/RepositoryProtocol.swift:3&quot;&gt;
+        &lt;summary&gt;Type &#x27;EntityProtocol&#x27; conforms to Sendable, establishing thread-safe concurrency boundaries across actors&lt;/summary&gt;
+        &lt;evidence&gt;
+          &lt;item rule=&quot;CONCURRENCY_SENDABLE_CONFORMANCE&quot; weight=&quot;+85%&quot;&gt;Type &#x27;EntityProtocol&#x27; conforms to Sendable, establishing thread-safe concurrency boundaries across actors&lt;/item&gt;
+        &lt;/evidence&gt;
+      &lt;/pattern&gt;
+      &lt;pattern type=&quot;sendable_thread_safety&quot; target=&quot;UserAccount&quot; category=&quot;concurrency&quot; confidence=&quot;85%&quot; location=&quot;/Volumes/External/Code/DPX-Swift/examples/clean_ios_architecture/Services/AccountDataStore.swift:3&quot;&gt;
+        &lt;summary&gt;Type &#x27;UserAccount&#x27; conforms to Sendable, establishing thread-safe concurrency boundaries across actors&lt;/summary&gt;
+        &lt;evidence&gt;
+          &lt;item rule=&quot;CONCURRENCY_SENDABLE_CONFORMANCE&quot; weight=&quot;+85%&quot;&gt;Type &#x27;UserAccount&#x27; conforms to Sendable, establishing thread-safe concurrency boundaries across actors&lt;/item&gt;
+        &lt;/evidence&gt;
+      &lt;/pattern&gt;
+      &lt;pattern type=&quot;view_modifier_pipeline&quot; target=&quot;PrimaryCardModifier&quot; category=&quot;declarative_dsl&quot; confidence=&quot;95%&quot; location=&quot;/Volumes/External/Code/DPX-Swift/examples/clean_ios_architecture/Views/ProfileView.swift:3&quot;&gt;
+        &lt;summary&gt;Struct &#x27;PrimaryCardModifier&#x27; conforms to ViewModifier providing reusable composable view transformation pipeline&lt;/summary&gt;
+        &lt;evidence&gt;
+          &lt;item rule=&quot;DSL_VIEW_MODIFIER_CONFORMANCE&quot; weight=&quot;+95%&quot;&gt;Struct &#x27;PrimaryCardModifier&#x27; conforms to ViewModifier providing reusable composable view transformation pipeline&lt;/item&gt;
+        &lt;/evidence&gt;
+      &lt;/pattern&gt;
+      &lt;pattern type=&quot;singleton_shared_instance&quot; target=&quot;NetworkFacadeService&quot; category=&quot;creational&quot; confidence=&quot;95%&quot; location=&quot;/Volumes/External/Code/DPX-Swift/examples/clean_ios_architecture/Services/NetworkFacade.swift:3&quot;&gt;
+        &lt;summary&gt;Type &#x27;NetworkFacadeService&#x27; defines thread-safe static shared singleton instance with private initialization&lt;/summary&gt;
+        &lt;evidence&gt;
+          &lt;item rule=&quot;CREATIONAL_SINGLETON_SHARED_INSTANCE&quot; weight=&quot;+95%&quot;&gt;Type &#x27;NetworkFacadeService&#x27; defines thread-safe static shared singleton instance with private initialization&lt;/item&gt;
+        &lt;/evidence&gt;
+      &lt;/pattern&gt;
+      &lt;pattern type=&quot;composite_view_hierarchy&quot; target=&quot;ProfileContainerView&quot; category=&quot;structural&quot; confidence=&quot;85%&quot; location=&quot;/Volumes/External/Code/DPX-Swift/examples/clean_ios_architecture/Views/ProfileView.swift:12&quot;&gt;
+        &lt;summary&gt;SwiftUI View &#x27;ProfileContainerView&#x27; implements Composite pattern hosting nested child view hierarchy via @ViewBuilder&lt;/summary&gt;
+        &lt;evidence&gt;
+          &lt;item rule=&quot;STRUCTURAL_COMPOSITE_VIEW&quot; weight=&quot;+85%&quot;&gt;SwiftUI View &#x27;ProfileContainerView&#x27; implements Composite pattern hosting nested child view hierarchy via @ViewBuilder&lt;/item&gt;
+        &lt;/evidence&gt;
+      &lt;/pattern&gt;
+      &lt;pattern type=&quot;facade_service&quot; target=&quot;NetworkFacadeService&quot; category=&quot;structural&quot; confidence=&quot;90%&quot; location=&quot;/Volumes/External/Code/DPX-Swift/examples/clean_ios_architecture/Services/NetworkFacade.swift:3&quot;&gt;
+        &lt;summary&gt;Type &#x27;NetworkFacadeService&#x27; coordinates 0 subsystem dependencies as a unified Facade&lt;/summary&gt;
+        &lt;evidence&gt;
+          &lt;item rule=&quot;STRUCTURAL_FACADE_SERVICE&quot; weight=&quot;+90%&quot;&gt;Type &#x27;NetworkFacadeService&#x27; coordinates 0 subsystem dependencies as a unified Facade&lt;/item&gt;
+        &lt;/evidence&gt;
+      &lt;/pattern&gt;
+      &lt;pattern type=&quot;delegate_pattern_weak&quot; target=&quot;UserViewModel.delegate&quot; category=&quot;behavioral&quot; confidence=&quot;90%&quot; location=&quot;/Volumes/External/Code/DPX-Swift/examples/clean_ios_architecture/ViewModels/UserViewModel.swift:13&quot;&gt;
+        &lt;summary&gt;Property &#x27;UserViewModel.delegate&#x27; implements safe Weak Delegate pattern avoiding retain cycles&lt;/summary&gt;
+        &lt;evidence&gt;
+          &lt;item rule=&quot;BEHAVIORAL_DELEGATE_PATTERN_WEAK&quot; weight=&quot;+90%&quot;&gt;Property &#x27;UserViewModel.delegate&#x27; implements safe Weak Delegate pattern avoiding retain cycles&lt;/item&gt;
+        &lt;/evidence&gt;
+      &lt;/pattern&gt;
+      &lt;pattern type=&quot;observer_combine_published&quot; target=&quot;UserViewModel&quot; category=&quot;behavioral&quot; confidence=&quot;95%&quot; location=&quot;/Volumes/External/Code/DPX-Swift/examples/clean_ios_architecture/ViewModels/UserViewModel.swift:9&quot;&gt;
+        &lt;summary&gt;Type &#x27;UserViewModel&#x27; acts as Reactive Observer Subject with 2 @Published / Subject property(ies)&lt;/summary&gt;
+        &lt;evidence&gt;
+          &lt;item rule=&quot;BEHAVIORAL_OBSERVER_COMBINE&quot; weight=&quot;+95%&quot;&gt;Type &#x27;UserViewModel&#x27; acts as Reactive Observer Subject with 2 @Published / Subject property(ies)&lt;/item&gt;
+        &lt;/evidence&gt;
+      &lt;/pattern&gt;
+      &lt;pattern type=&quot;state_enum_associated_values&quot; target=&quot;SessionState&quot; category=&quot;behavioral&quot; confidence=&quot;80%&quot; location=&quot;/Volumes/External/Code/DPX-Swift/examples/clean_ios_architecture/Models/AppState.swift:3&quot;&gt;
+        &lt;summary&gt;Enum &#x27;SessionState&#x27; models type-safe State Machine with associated lifecycle states&lt;/summary&gt;
+        &lt;evidence&gt;
+          &lt;item rule=&quot;BEHAVIORAL_STATE_ENUM&quot; weight=&quot;+80%&quot;&gt;Enum &#x27;SessionState&#x27; models type-safe State Machine with associated lifecycle states&lt;/item&gt;
+        &lt;/evidence&gt;
+      &lt;/pattern&gt;
+      &lt;pattern type=&quot;memento_codable_snapshot&quot; target=&quot;AppStateSnapshot&quot; category=&quot;behavioral&quot; confidence=&quot;85%&quot; location=&quot;/Volumes/External/Code/DPX-Swift/examples/clean_ios_architecture/Models/AppState.swift:10&quot;&gt;
+        &lt;summary&gt;Type &#x27;AppStateSnapshot&#x27; captures and externalizes object state as a Memento Snapshot&lt;/summary&gt;
+        &lt;evidence&gt;
+          &lt;item rule=&quot;BEHAVIORAL_MEMENTO_SNAPSHOT&quot; weight=&quot;+85%&quot;&gt;Type &#x27;AppStateSnapshot&#x27; captures and externalizes object state as a Memento Snapshot&lt;/item&gt;
+        &lt;/evidence&gt;
+      &lt;/pattern&gt;
+    &lt;/swift_design_patterns_and_concurrency&gt;
+  &lt;/project&gt;
+&lt;/codebase_architecture_analysis&gt;</textarea>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-view-prompt" onclick="closePromptModal()">Close</button>
+                <button class="btn-ai-context" onclick="copyModalPrompt()">📋 Copy Prompt</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const FULL_LLM_PROMPT = "<codebase_architecture_analysis language=\"swift\">\n  <project path=\"/Volumes/External/Code/DPX-Swift/examples/clean_ios_architecture\" files=\"6\" detections=\"19\">\n    <category_summary>\n      <category name=\"PROTOCOL_ORIENTED\" count=\"4\" />\n      <category name=\"CONCURRENCY\" count=\"7\" />\n      <category name=\"DECLARATIVE_DSL\" count=\"1\" />\n      <category name=\"CREATIONAL\" count=\"1\" />\n      <category name=\"STRUCTURAL\" count=\"2\" />\n      <category name=\"BEHAVIORAL\" count=\"4\" />\n    </category_summary>\n    <swift_design_patterns_and_concurrency>\n      <pattern type=\"protocol_extension_default_impl\" target=\"RepositoryProtocol\" category=\"protocol_oriented\" confidence=\"90%\" location=\"/Volumes/External/Code/DPX-Swift/examples/clean_ios_architecture/Protocols/RepositoryProtocol.swift:16\">\n        <summary>Extension on protocol 'RepositoryProtocol' provides default implementation for 1 method(s): all</summary>\n        <evidence>\n          <item rule=\"POP_PROTOCOL_EXTENSION_DEFAULT_IMPL\" weight=\"+90%\">Extension on protocol 'RepositoryProtocol' provides default implementation for 1 method(s): all</item>\n        </evidence>\n      </pattern>\n      <pattern type=\"associated_type_pat\" target=\"EntityProtocol\" category=\"protocol_oriented\" confidence=\"90%\" location=\"/Volumes/External/Code/DPX-Swift/examples/clean_ios_architecture/Protocols/RepositoryProtocol.swift:3\">\n        <summary>Protocol 'EntityProtocol' defines associated type(s) (ID), enabling generic protocol abstraction</summary>\n        <evidence>\n          <item rule=\"POP_ASSOCIATED_TYPE_PAT\" weight=\"+90%\">Protocol 'EntityProtocol' defines associated type(s) (ID), enabling generic protocol abstraction</item>\n        </evidence>\n      </pattern>\n      <pattern type=\"associated_type_pat\" target=\"RepositoryProtocol\" category=\"protocol_oriented\" confidence=\"90%\" location=\"/Volumes/External/Code/DPX-Swift/examples/clean_ios_architecture/Protocols/RepositoryProtocol.swift:8\">\n        <summary>Protocol 'RepositoryProtocol' defines associated type(s) (Entity), enabling generic protocol abstraction</summary>\n        <evidence>\n          <item rule=\"POP_ASSOCIATED_TYPE_PAT\" weight=\"+90%\">Protocol 'RepositoryProtocol' defines associated type(s) (Entity), enabling generic protocol abstraction</item>\n        </evidence>\n      </pattern>\n      <pattern type=\"opaque_return_type\" target=\"body\" category=\"protocol_oriented\" confidence=\"85%\" location=\"/Volumes/External/Code/DPX-Swift/examples/clean_ios_architecture/Views/ProfileView.swift:4\">\n        <summary>Method 'body' returns opaque type 'some View', hiding concrete type implementation while preserving type identity</summary>\n        <evidence>\n          <item rule=\"POP_OPAQUE_RETURN_TYPE\" weight=\"+85%\">Method 'body' returns opaque type 'some View', hiding concrete type implementation while preserving type identity</item>\n        </evidence>\n      </pattern>\n      <pattern type=\"actor_model_isolation\" target=\"AccountDataStore\" category=\"concurrency\" confidence=\"95%\" location=\"/Volumes/External/Code/DPX-Swift/examples/clean_ios_architecture/Services/AccountDataStore.swift:9\">\n        <summary>Actor 'AccountDataStore' guarantees data isolation and thread safety via the Swift Actor model</summary>\n        <evidence>\n          <item rule=\"CONCURRENCY_ACTOR_ISOLATION\" weight=\"+95%\">Actor 'AccountDataStore' guarantees data isolation and thread safety via the Swift Actor model</item>\n        </evidence>\n      </pattern>\n      <pattern type=\"main_actor_ui_binding\" target=\"UserViewModel\" category=\"concurrency\" confidence=\"95%\" location=\"/Volumes/External/Code/DPX-Swift/examples/clean_ios_architecture/ViewModels/UserViewModel.swift:9\">\n        <summary>Type 'UserViewModel' is bound to @MainActor ensuring all state updates and UI interactions dispatch safely on the main thread</summary>\n        <evidence>\n          <item rule=\"CONCURRENCY_MAIN_ACTOR_BINDING\" weight=\"+95%\">Type 'UserViewModel' is bound to @MainActor ensuring all state updates and UI interactions dispatch safely on the main thread</item>\n        </evidence>\n      </pattern>\n      <pattern type=\"task_group_concurrency\" target=\"batchSyncAll\" category=\"concurrency\" confidence=\"90%\" location=\"/Volumes/External/Code/DPX-Swift/examples/clean_ios_architecture/Services/NetworkFacade.swift:7\">\n        <summary>Method 'batchSyncAll' utilizes structured concurrency 'withThrowingTaskGroup' for dynamic parallel task fan-out and collection</summary>\n        <evidence>\n          <item rule=\"CONCURRENCY_TASK_GROUP\" weight=\"+90%\">Method 'batchSyncAll' utilizes structured concurrency 'withThrowingTaskGroup' for dynamic parallel task fan-out and collection</item>\n        </evidence>\n      </pattern>\n      <pattern type=\"sendable_thread_safety\" target=\"SessionState\" category=\"concurrency\" confidence=\"85%\" location=\"/Volumes/External/Code/DPX-Swift/examples/clean_ios_architecture/Models/AppState.swift:3\">\n        <summary>Type 'SessionState' conforms to Sendable, establishing thread-safe concurrency boundaries across actors</summary>\n        <evidence>\n          <item rule=\"CONCURRENCY_SENDABLE_CONFORMANCE\" weight=\"+85%\">Type 'SessionState' conforms to Sendable, establishing thread-safe concurrency boundaries across actors</item>\n        </evidence>\n      </pattern>\n      <pattern type=\"sendable_thread_safety\" target=\"AppStateSnapshot\" category=\"concurrency\" confidence=\"85%\" location=\"/Volumes/External/Code/DPX-Swift/examples/clean_ios_architecture/Models/AppState.swift:10\">\n        <summary>Type 'AppStateSnapshot' conforms to Sendable, establishing thread-safe concurrency boundaries across actors</summary>\n        <evidence>\n          <item rule=\"CONCURRENCY_SENDABLE_CONFORMANCE\" weight=\"+85%\">Type 'AppStateSnapshot' conforms to Sendable, establishing thread-safe concurrency boundaries across actors</item>\n        </evidence>\n      </pattern>\n      <pattern type=\"sendable_thread_safety\" target=\"EntityProtocol\" category=\"concurrency\" confidence=\"85%\" location=\"/Volumes/External/Code/DPX-Swift/examples/clean_ios_architecture/Protocols/RepositoryProtocol.swift:3\">\n        <summary>Type 'EntityProtocol' conforms to Sendable, establishing thread-safe concurrency boundaries across actors</summary>\n        <evidence>\n          <item rule=\"CONCURRENCY_SENDABLE_CONFORMANCE\" weight=\"+85%\">Type 'EntityProtocol' conforms to Sendable, establishing thread-safe concurrency boundaries across actors</item>\n        </evidence>\n      </pattern>\n      <pattern type=\"sendable_thread_safety\" target=\"UserAccount\" category=\"concurrency\" confidence=\"85%\" location=\"/Volumes/External/Code/DPX-Swift/examples/clean_ios_architecture/Services/AccountDataStore.swift:3\">\n        <summary>Type 'UserAccount' conforms to Sendable, establishing thread-safe concurrency boundaries across actors</summary>\n        <evidence>\n          <item rule=\"CONCURRENCY_SENDABLE_CONFORMANCE\" weight=\"+85%\">Type 'UserAccount' conforms to Sendable, establishing thread-safe concurrency boundaries across actors</item>\n        </evidence>\n      </pattern>\n      <pattern type=\"view_modifier_pipeline\" target=\"PrimaryCardModifier\" category=\"declarative_dsl\" confidence=\"95%\" location=\"/Volumes/External/Code/DPX-Swift/examples/clean_ios_architecture/Views/ProfileView.swift:3\">\n        <summary>Struct 'PrimaryCardModifier' conforms to ViewModifier providing reusable composable view transformation pipeline</summary>\n        <evidence>\n          <item rule=\"DSL_VIEW_MODIFIER_CONFORMANCE\" weight=\"+95%\">Struct 'PrimaryCardModifier' conforms to ViewModifier providing reusable composable view transformation pipeline</item>\n        </evidence>\n      </pattern>\n      <pattern type=\"singleton_shared_instance\" target=\"NetworkFacadeService\" category=\"creational\" confidence=\"95%\" location=\"/Volumes/External/Code/DPX-Swift/examples/clean_ios_architecture/Services/NetworkFacade.swift:3\">\n        <summary>Type 'NetworkFacadeService' defines thread-safe static shared singleton instance with private initialization</summary>\n        <evidence>\n          <item rule=\"CREATIONAL_SINGLETON_SHARED_INSTANCE\" weight=\"+95%\">Type 'NetworkFacadeService' defines thread-safe static shared singleton instance with private initialization</item>\n        </evidence>\n      </pattern>\n      <pattern type=\"composite_view_hierarchy\" target=\"ProfileContainerView\" category=\"structural\" confidence=\"85%\" location=\"/Volumes/External/Code/DPX-Swift/examples/clean_ios_architecture/Views/ProfileView.swift:12\">\n        <summary>SwiftUI View 'ProfileContainerView' implements Composite pattern hosting nested child view hierarchy via @ViewBuilder</summary>\n        <evidence>\n          <item rule=\"STRUCTURAL_COMPOSITE_VIEW\" weight=\"+85%\">SwiftUI View 'ProfileContainerView' implements Composite pattern hosting nested child view hierarchy via @ViewBuilder</item>\n        </evidence>\n      </pattern>\n      <pattern type=\"facade_service\" target=\"NetworkFacadeService\" category=\"structural\" confidence=\"90%\" location=\"/Volumes/External/Code/DPX-Swift/examples/clean_ios_architecture/Services/NetworkFacade.swift:3\">\n        <summary>Type 'NetworkFacadeService' coordinates 0 subsystem dependencies as a unified Facade</summary>\n        <evidence>\n          <item rule=\"STRUCTURAL_FACADE_SERVICE\" weight=\"+90%\">Type 'NetworkFacadeService' coordinates 0 subsystem dependencies as a unified Facade</item>\n        </evidence>\n      </pattern>\n      <pattern type=\"delegate_pattern_weak\" target=\"UserViewModel.delegate\" category=\"behavioral\" confidence=\"90%\" location=\"/Volumes/External/Code/DPX-Swift/examples/clean_ios_architecture/ViewModels/UserViewModel.swift:13\">\n        <summary>Property 'UserViewModel.delegate' implements safe Weak Delegate pattern avoiding retain cycles</summary>\n        <evidence>\n          <item rule=\"BEHAVIORAL_DELEGATE_PATTERN_WEAK\" weight=\"+90%\">Property 'UserViewModel.delegate' implements safe Weak Delegate pattern avoiding retain cycles</item>\n        </evidence>\n      </pattern>\n      <pattern type=\"observer_combine_published\" target=\"UserViewModel\" category=\"behavioral\" confidence=\"95%\" location=\"/Volumes/External/Code/DPX-Swift/examples/clean_ios_architecture/ViewModels/UserViewModel.swift:9\">\n        <summary>Type 'UserViewModel' acts as Reactive Observer Subject with 2 @Published / Subject property(ies)</summary>\n        <evidence>\n          <item rule=\"BEHAVIORAL_OBSERVER_COMBINE\" weight=\"+95%\">Type 'UserViewModel' acts as Reactive Observer Subject with 2 @Published / Subject property(ies)</item>\n        </evidence>\n      </pattern>\n      <pattern type=\"state_enum_associated_values\" target=\"SessionState\" category=\"behavioral\" confidence=\"80%\" location=\"/Volumes/External/Code/DPX-Swift/examples/clean_ios_architecture/Models/AppState.swift:3\">\n        <summary>Enum 'SessionState' models type-safe State Machine with associated lifecycle states</summary>\n        <evidence>\n          <item rule=\"BEHAVIORAL_STATE_ENUM\" weight=\"+80%\">Enum 'SessionState' models type-safe State Machine with associated lifecycle states</item>\n        </evidence>\n      </pattern>\n      <pattern type=\"memento_codable_snapshot\" target=\"AppStateSnapshot\" category=\"behavioral\" confidence=\"85%\" location=\"/Volumes/External/Code/DPX-Swift/examples/clean_ios_architecture/Models/AppState.swift:10\">\n        <summary>Type 'AppStateSnapshot' captures and externalizes object state as a Memento Snapshot</summary>\n        <evidence>\n          <item rule=\"BEHAVIORAL_MEMENTO_SNAPSHOT\" weight=\"+85%\">Type 'AppStateSnapshot' captures and externalizes object state as a Memento Snapshot</item>\n        </evidence>\n      </pattern>\n    </swift_design_patterns_and_concurrency>\n  </project>\n</codebase_architecture_analysis>";
+
+        function showToast(message) {
+            const toast = document.getElementById('toast');
+            const msgSpan = document.getElementById('toastMsg');
+            msgSpan.textContent = message;
+            toast.classList.add('show');
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 2500);
+        }
+
+        function copyFullAiContext() {
+            navigator.clipboard.writeText(FULL_LLM_PROMPT).then(() => {
+                showToast("✅ Full AI Context Prompt copied to clipboard!");
+            }).catch(err => {
+                console.error("Failed to copy", err);
+            });
+        }
+
+        function copySingleAiPrompt(promptText) {
+            navigator.clipboard.writeText(promptText).then(() => {
+                showToast("✅ Finding refactoring prompt copied for AI!");
+            }).catch(err => {
+                console.error("Failed to copy", err);
+            });
+        }
+
+        function openPromptModal() {
+            document.getElementById('promptModal').style.display = 'flex';
+        }
+
+        function closePromptModal() {
+            document.getElementById('promptModal').style.display = 'none';
+        }
+
+        function closeModalOnOverlay(e) {
+            if (e.target.id === 'promptModal') {
+                closePromptModal();
+            }
+        }
+
+        function copyModalPrompt() {
+            const textarea = document.getElementById('modalPromptArea');
+            navigator.clipboard.writeText(textarea.value).then(() => {
+                showToast("✅ Prompt copied to clipboard!");
+                closePromptModal();
+            });
+        }
+
+        const searchInput = document.getElementById('searchInput');
+        const cards = document.querySelectorAll('.pattern-card');
+        const filterBtns = document.querySelectorAll('.cat-filter-btn');
+        let selectedCategory = 'all';
+
+        function filterCards() {
+            const query = searchInput.value.toLowerCase();
+            cards.forEach(card => {
+                const text = card.textContent.toLowerCase();
+                const pattern = card.dataset.pattern || '';
+                const category = card.dataset.category || '';
+                const target = card.dataset.target || '';
+
+                const matchesCategory = (selectedCategory === 'all' || category === selectedCategory);
+                const matchesSearch = (text.includes(query) || pattern.includes(query) || category.includes(query) || target.includes(query));
+
+                if (matchesCategory && matchesSearch) {
+                    card.style.display = 'block';
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+        }
+
+        searchInput.addEventListener('input', filterCards);
+
+        filterBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                selectedCategory = btn.dataset.filter;
+                filterBtns.forEach(b => b.style.outline = 'none');
+                btn.style.outline = '2px solid #f97316';
+                filterCards();
+            });
+        });
+    </script>
+</body>
+</html>

@@ -56,7 +56,7 @@ class RetainCycleStrongSelfRule(BaseRule):
 class ForceUnwrappingHazardRule(BaseRule):
     """Detects unsafe force-unwrapping (`!`, `as!`, `try!`) causing runtime fatal crashes."""
 
-    FORCE_UNWRAP_PATTERN = re.compile(r"(\w+!\b|\bas!\b|\btry!\b)")
+    FORCE_UNWRAP_PATTERN = re.compile(r"(\w+!|\)!|\bas!\b|\btry!\b)")
 
     def evaluate(self, model: CodeModel) -> list[Detection]:
         detections: list[Detection] = []
